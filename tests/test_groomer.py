@@ -43,3 +43,33 @@ def test_groomer_empty_pipeline():
 
     result = groomer.run("unchanged")
     assert result == "unchanged"
+
+
+def test_pipe_operator_two_operations():
+    """Test pipe operator with two operations."""
+    pipeline = StripHTML() | NormalizeWhitespace()
+
+    result = pipeline.run("<div>  hello   world  </div>")
+    assert result == "hello world"
+
+
+def test_pipe_operator_multiple():
+    """Test pipe operator with three operations chained."""
+    pipeline = StripHTML() | NormalizeWhitespace() | TruncateTokens(max_tokens=3, strategy="head")
+
+    result = pipeline.run("<div>  User input with <b>lots</b> of   spaces... </div>")
+    assert result == "User input with"
+
+
+def test_pipe_operator_full_pipeline():
+    """Test pipe operator with realistic full pipeline."""
+    pipeline = StripHTML() | NormalizeWhitespace() | TruncateTokens(max_tokens=10, strategy="head")
+
+    raw_input = "<div>  User input with <b>lots</b> of   spaces... </div>"
+    clean_prompt = pipeline.run(raw_input)
+
+    # Should strip HTML, normalize whitespace, and keep first 10 words
+    assert "<" not in clean_prompt
+    assert ">" not in clean_prompt
+    assert "  " not in clean_prompt
+    assert len(clean_prompt) > 0

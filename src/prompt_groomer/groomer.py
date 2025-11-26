@@ -39,3 +39,22 @@ class Groomer:
         for operation in self._operations:
             result = operation.process(result)
         return result
+
+    def __or__(self, other: Operation) -> "Groomer":
+        """
+        Support pipe operator syntax for adding operations to the pipeline.
+
+        Enables continued chaining: (op1 | op2) | op3
+
+        Args:
+            other: The operation to add to the pipeline
+
+        Returns:
+            Self for method chaining
+
+        Example:
+            >>> from prompt_groomer import StripHTML, NormalizeWhitespace, TruncateTokens
+            >>> pipeline = StripHTML() | NormalizeWhitespace() | TruncateTokens(max_tokens=100)
+            >>> result = pipeline.run(text)
+        """
+        return self.pipe(other)
