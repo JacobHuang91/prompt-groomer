@@ -1547,6 +1547,14 @@
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Sentence-level deduplication</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">deduper</span> <span class="o">=</span> <span class="n">Deduplicate</span><span class="p">(</span><span class="n">granularity</span><span class="o">=</span><span class="s2">&quot;sentence&quot;</span><span class="p">)</span>
 </code></pre></div>
+<p><strong>Performance Considerations:</strong></p>
+<ul>
+<li><strong>Method Choice</strong>: Use <code>jaccard</code> (default) for most cases - it's fast and works well with typical prompts. Only use <code>levenshtein</code> when you need character-level precision.</li>
+<li><strong>Complexity</strong>: Deduplication uses O(n²) comparisons where n is the number of chunks. For 50 chunks, this is ~1,225 comparisons.</li>
+<li><strong>Large Inputs</strong>: For 200+ chunks, use <code>granularity="paragraph"</code> to reduce chunk count and speed up processing.</li>
+<li><strong>Jaccard</strong>: O(m) per comparison - fast even with long chunks</li>
+<li><strong>Levenshtein</strong>: O(m₁ × m₂) per comparison - can be slow with chunks over 1000 characters</li>
+</ul>
 <p><a class="md-button" href="../../api-reference/compressor/#deduplicate">Full API Reference →</a></p>
 <h2 id="common-use-cases">Common Use Cases</h2>
 <h3 id="rag-context-optimization">RAG Context Optimization</h3>

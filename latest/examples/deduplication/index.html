@@ -1247,6 +1247,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#performance-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choosing-a-similarity-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing a Similarity Method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scaling-with-input-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling with Input Size
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#full-example" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1455,6 +1494,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#performance-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choosing-a-similarity-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing a Similarity Method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scaling-with-input-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling with Input Size
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#full-example" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1524,6 +1602,32 @@
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Sentence-level deduplication</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">groomer</span> <span class="o">=</span> <span class="n">Groomer</span><span class="p">()</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Deduplicate</span><span class="p">(</span><span class="n">granularity</span><span class="o">=</span><span class="s2">&quot;sentence&quot;</span><span class="p">))</span>
+</code></pre></div>
+<h2 id="performance-considerations">Performance Considerations</h2>
+<p>When working with large RAG contexts, keep these performance tips in mind:</p>
+<h3 id="choosing-a-similarity-method">Choosing a Similarity Method</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Fast: Jaccard (word-based) - recommended for most use cases</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">groomer</span> <span class="o">=</span> <span class="n">Groomer</span><span class="p">()</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Deduplicate</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;jaccard&quot;</span><span class="p">))</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Precise but slower: Levenshtein (character-based)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Only use when you need character-level accuracy</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">groomer</span> <span class="o">=</span> <span class="n">Groomer</span><span class="p">()</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Deduplicate</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;levenshtein&quot;</span><span class="p">))</span>
+</code></pre></div>
+<h3 id="scaling-with-input-size">Scaling with Input Size</h3>
+<p>The deduplication algorithm compares each chunk against all previous chunks (O(n²)):</p>
+<ul>
+<li><strong>10-50 chunks</strong>: Fast with either method (typical RAG use case)</li>
+<li><strong>50-200 chunks</strong>: Use Jaccard for better performance</li>
+<li><strong>200+ chunks</strong>: Use <code>granularity="paragraph"</code> to reduce chunk count</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># For large documents: use paragraph granularity</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">groomer</span> <span class="o">=</span> <span class="n">Groomer</span><span class="p">()</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">Deduplicate</span><span class="p">(</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="n">similarity_threshold</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;jaccard&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="n">granularity</span><span class="o">=</span><span class="s2">&quot;paragraph&quot;</span>  <span class="c1"># Fewer chunks = faster</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="p">)</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span>
 </code></pre></div>
 <h2 id="full-example">Full Example</h2>
 <p>See: <a href="https://github.com/JacobHuang91/prompt-groomer/blob/main/examples/compressor/deduplication.py"><code>examples/compressor/deduplication.py</code></a></p>
