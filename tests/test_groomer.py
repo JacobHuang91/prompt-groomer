@@ -14,11 +14,7 @@ def test_groomer_single_operation():
 
 def test_groomer_multiple_operations():
     """Test groomer with multiple chained operations."""
-    groomer = (
-        Groomer()
-        .pipe(StripHTML())
-        .pipe(NormalizeWhitespace())
-    )
+    groomer = Groomer().pipe(StripHTML()).pipe(NormalizeWhitespace())
 
     result = groomer.run("<div>  hello   world  </div>")
     assert result == "hello world"
