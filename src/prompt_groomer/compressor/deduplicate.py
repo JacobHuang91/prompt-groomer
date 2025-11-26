@@ -1,6 +1,6 @@
 """Deduplication operation for removing similar text chunks."""
 
-from typing import Literal
+from typing import List, Literal
 
 from ..operation import Operation
 
@@ -30,7 +30,7 @@ class Deduplicate(Operation):
         self.method = method
         self.granularity = granularity
 
-    def _split_text(self, text: str) -> list[str]:
+    def _split_text(self, text: str) -> List[str]:
         """
         Split text into chunks based on granularity.
 

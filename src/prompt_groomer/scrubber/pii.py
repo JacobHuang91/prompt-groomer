@@ -1,7 +1,7 @@
 """PII (Personally Identifiable Information) redaction operation."""
 
 import re
-from typing import Optional, Set
+from typing import Dict, Optional, Set
 
 from ..operation import Operation
 
@@ -32,7 +32,7 @@ class RedactPII(Operation):
     def __init__(
         self,
         redact_types: Optional[Set[str]] = None,
-        custom_patterns: Optional[dict[str, str]] = None,
+        custom_patterns: Optional[Dict[str, str]] = None,
         custom_keywords: Optional[Set[str]] = None,
     ):
         """
