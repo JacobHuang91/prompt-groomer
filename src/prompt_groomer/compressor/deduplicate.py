@@ -6,7 +6,21 @@ from ..operation import Operation
 
 
 class Deduplicate(Operation):
-    """Remove duplicate or highly similar text chunks (useful for RAG contexts)."""
+    """Remove duplicate or highly similar text chunks (useful for RAG contexts).
+
+    Performance Characteristics:
+        This operation uses an O(n²) comparison algorithm, where each chunk is
+        compared against all previously seen chunks. The total complexity is
+        O(n² × comparison_cost), where comparison_cost depends on the selected
+        similarity method:
+        - Jaccard: O(m) where m is the chunk length (word-based)
+        - Levenshtein: O(m₁ × m₂) where m₁, m₂ are the chunk lengths (character-based)
+
+        For typical RAG contexts (10-50 chunks), performance is acceptable with
+        either method. For larger inputs (200+ chunks), consider using paragraph
+        granularity to reduce the number of comparisons, or use Jaccard method
+        for better performance.
+    """
 
     def __init__(
         self,
@@ -20,11 +34,21 @@ class Deduplicate(Operation):
         Args:
             similarity_threshold: Threshold for considering text similar (0.0-1.0)
             method: Similarity calculation method
-                - "levenshtein": Levenshtein distance (character-based)
                 - "jaccard": Jaccard similarity (word-based, faster)
+                    * Complexity: O(m) per comparison where m is chunk length
+                    * Recommended for most use cases (10-200 chunks)
+                    * Fast even with long chunks
+                - "levenshtein": Levenshtein distance (character-based)
+                    * Complexity: O(m₁ × m₂) per comparison
+                    * More precise but computationally expensive
+                    * Can be slow with long chunks (1000+ characters)
             granularity: Text granularity to deduplicate at
                 - "sentence": Deduplicate at sentence level
+                    * More comparisons (more chunks) but smaller chunk sizes
+                    * Better for fine-grained deduplication
                 - "paragraph": Deduplicate at paragraph level
+                    * Fewer comparisons but larger chunk sizes
+                    * Recommended for large documents to reduce n² scaling
         """
         self.similarity_threshold = similarity_threshold
         self.method = method
@@ -146,6 +170,12 @@ class Deduplicate(Operation):
 
         Returns:
             Text with duplicates removed
+
+        Performance Note:
+            This method uses O(n²) comparisons where n is the number of chunks.
+            For large inputs (200+ chunks), consider using paragraph granularity
+            to reduce the number of chunks, or ensure you're using the jaccard
+            method for better performance.
         """
         chunks = self._split_text(text)
 

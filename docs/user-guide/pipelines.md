@@ -2,22 +2,64 @@
 
 Learn how to build effective pipelines with Prompt Groomer.
 
+## Two Ways to Build Pipelines
+
+Prompt Groomer supports two syntax options for building pipelines:
+
+### Pipe Operator (Recommended)
+
+The pipe operator (`|`) provides a clean, Pythonic syntax similar to LangChain:
+
+```python
+from prompt_groomer import StripHTML, NormalizeWhitespace, TruncateTokens
+
+pipeline = (
+    StripHTML()
+    | NormalizeWhitespace()
+    | TruncateTokens(max_tokens=1000)
+)
+
+result = pipeline.run(input_text)
+```
+
+**Why use this:**
+- More concise - no need to import or instantiate `Groomer()`
+- Familiar to LangChain, LangGraph, and modern Python framework users
+- Cleaner visual appearance
+
+### Fluent API
+
+The fluent API uses method chaining with `.pipe()`:
+
+```python
+from prompt_groomer import Groomer, StripHTML, NormalizeWhitespace, TruncateTokens
+
+pipeline = (
+    Groomer()
+    .pipe(StripHTML())
+    .pipe(NormalizeWhitespace())
+    .pipe(TruncateTokens(max_tokens=1000))
+)
+
+result = pipeline.run(input_text)
+```
+
+**Why use this:**
+- More explicit - clear that you're creating a Groomer pipeline
+- Traditional method chaining pattern
+
+!!! tip "Choose One Style"
+    Pick one syntax style per project and use it consistently. Both work identically under the hood. Don't mix styles in the same pipeline.
+
 ## The Pipeline Pattern
 
 A pipeline chains operations in sequence:
 
 ```python
-from prompt_groomer import Groomer
-
-pipeline = (
-    Groomer()
-    .pipe(Operation1())
-    .pipe(Operation2())
-    .pipe(Operation3())
-)
-
-result = pipeline.run(input_text)
+input → Operation1 → Operation2 → Operation3 → output
 ```
+
+All operations process the text in order, with each operation's output becoming the next operation's input.
 
 ## How Pipelines Work
 
@@ -35,11 +77,11 @@ input → Operation1 → Operation2 → Operation3 → output
 Operations run in the order you add them:
 
 ```python
-# Clean HTML first, then normalize
-Groomer().pipe(StripHTML()).pipe(NormalizeWhitespace())
+# ✅ Correct: Clean HTML first, then normalize
+pipeline = StripHTML() | NormalizeWhitespace()
 
-# Wrong order - normalizes first, HTML remains
-Groomer().pipe(NormalizeWhitespace()).pipe(StripHTML())
+# ❌ Wrong order - normalizes first, HTML remains
+pipeline = NormalizeWhitespace() | StripHTML()
 ```
 
 ## Best Practices
@@ -47,28 +89,34 @@ Groomer().pipe(NormalizeWhitespace()).pipe(StripHTML())
 ### 1. Clean Before Compressing
 
 ```python
-Groomer()
-    .pipe(StripHTML())           # Clean first
-    .pipe(NormalizeWhitespace())
-    .pipe(TruncateTokens())      # Then compress
+pipeline = (
+    StripHTML()                  # Clean first
+    | NormalizeWhitespace()
+    | TruncateTokens()           # Then compress
+)
 ```
 
 ### 2. Compress Before Redacting
 
 ```python
-Groomer()
-    .pipe(TruncateTokens())  # Compress first
-    .pipe(RedactPII())       # Then redact
+pipeline = (
+    TruncateTokens()  # Compress first
+    | RedactPII()     # Then redact
+)
 ```
 
 ### 3. Analyze Last
 
 ```python
+from prompt_groomer import Groomer  # Groomer needed for CountTokens pattern
+
 counter = CountTokens(original_text=text)
-Groomer()
+pipeline = (
+    Groomer()
     .pipe(StripHTML())
     .pipe(TruncateTokens())
     .pipe(counter)  # Analyze at the end
+)
 ```
 
 ## Multiple Pipelines
@@ -78,24 +126,24 @@ Create different pipelines for different use cases:
 ```python
 # Pipeline for web content
 web_pipeline = (
-    Groomer()
-    .pipe(StripHTML(to_markdown=True))
-    .pipe(FixUnicode())
-    .pipe(NormalizeWhitespace())
+    StripHTML(to_markdown=True)
+    | FixUnicode()
+    | NormalizeWhitespace()
 )
 
 # Pipeline for RAG
 rag_pipeline = (
-    Groomer()
-    .pipe(Deduplicate())
-    .pipe(TruncateTokens(max_tokens=2000))
+    Deduplicate()
+    | TruncateTokens(max_tokens=2000)
 )
 
 # Pipeline for secure processing
-secure_pipeline = (
-    Groomer()
-    .pipe(RedactPII())
-)
+secure_pipeline = RedactPII()
+
+# Use them
+cleaned_web = web_pipeline.run(html_content)
+optimized_rag = rag_pipeline.run(rag_context)
+safe_text = secure_pipeline.run(user_input)
 ```
 
 [Learn about custom operations →](custom-operations.md){ .md-button }
