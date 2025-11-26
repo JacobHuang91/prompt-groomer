@@ -1,7 +1,7 @@
 """Token truncation operation."""
 
 import re
-from typing import List, Literal
+from typing import Literal
 
 from ..operation import Operation
 
@@ -30,7 +30,7 @@ class TruncateTokens(Operation):
         self.strategy = strategy
         self.respect_sentence_boundary = respect_sentence_boundary
 
-    def _split_sentences(self, text: str) -> List[str]:
+    def _split_sentences(self, text: str) -> list[str]:
         """
         Split text into sentences.
 
@@ -101,7 +101,7 @@ class TruncateTokens(Operation):
 
         return text
 
-    def _truncate_head_sentences(self, sentences: List[str]) -> str:
+    def _truncate_head_sentences(self, sentences: list[str]) -> str:
         """Keep sentences from the beginning until we hit the token limit."""
         result = []
         token_count = 0
@@ -116,7 +116,7 @@ class TruncateTokens(Operation):
 
         return " ".join(result) if result else sentences[0][: self.max_tokens * 5]
 
-    def _truncate_tail_sentences(self, sentences: List[str]) -> str:
+    def _truncate_tail_sentences(self, sentences: list[str]) -> str:
         """Keep sentences from the end until we hit the token limit."""
         result = []
         token_count = 0
@@ -131,7 +131,7 @@ class TruncateTokens(Operation):
 
         return " ".join(result) if result else sentences[-1][-self.max_tokens * 5 :]
 
-    def _truncate_middle_out_sentences(self, sentences: List[str]) -> str:
+    def _truncate_middle_out_sentences(self, sentences: list[str]) -> str:
         """Keep sentences from beginning and end, truncate middle."""
         if not sentences:
             return ""
