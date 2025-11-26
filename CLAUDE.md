@@ -37,7 +37,7 @@ Each module contains specialized operations that can be composed into pipelines 
 
 ## Technology Stack
 
-- Python 3.8+
+- Python 3.9+
 - uv for package management
 - pytest for testing
 - ruff for linting and formatting
