@@ -81,6 +81,17 @@ examples/
 ├── scrubber/            # Scrubber examples
 ├── analyzer/            # Analyzer examples
 └── all_modules_demo.py  # Complete demo
+
+benchmark/
+└── simple/              # Simple A/B testing benchmark
+    ├── benchmark.py     # Main orchestrator
+    ├── datasets.py      # Test data loader
+    ├── evaluators.py    # Quality metrics (cosine + LLM judge)
+    ├── visualizer.py    # Matplotlib plots
+    ├── data/            # 30 curated test cases
+    │   ├── squad_samples.json
+    │   └── rag_scenarios.json
+    └── README.md        # Full benchmark documentation
 ```
 
 ## Testing
