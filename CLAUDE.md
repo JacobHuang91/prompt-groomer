@@ -83,7 +83,7 @@ examples/
 └── all_modules_demo.py  # Complete demo
 
 benchmark/
-└── simple/              # Simple A/B testing benchmark
+└── custom/              # Custom A/B testing benchmark
     ├── benchmark.py     # Main orchestrator
     ├── datasets.py      # Test data loader
     ├── evaluators.py    # Quality metrics (cosine + LLM judge)

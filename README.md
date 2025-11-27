@@ -148,13 +148,13 @@ We benchmarked Prompt Groomer on 30 real-world test cases (SQuAD + RAG scenarios
 
 <div align="center">
 
-![Token Reduction vs Quality](benchmark/simple/results/benchmark_results.png)
+![Token Reduction vs Quality](benchmark/custom/results/benchmark_results.png)
 
 </div>
 
 > 💰 **Cost Savings:** At scale (1M tokens/month), 15% reduction saves **~$54/month** on GPT-4 input tokens.
 >
-> 📖 **See full benchmark:** [benchmark/simple/README.md](benchmark/simple/README.md)
+> 📖 **See full benchmark:** [benchmark/custom/README.md](benchmark/custom/README.md)
 
 ## 4 Core Modules
 

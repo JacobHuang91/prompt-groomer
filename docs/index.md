@@ -14,7 +14,7 @@ Prompt Groomer helps you clean and optimize prompts before sending them to LLM A
 !!! success "Proven Effectiveness"
     Benchmarked on 30 real-world test cases, Prompt Groomer achieves **4-15% token reduction** while maintaining 96-99% quality. Aggressive optimization can save up to **~$54/month** on GPT-4 at scale (1M tokens/month).
 
-    [See benchmark results →](https://github.com/JacobHuang91/prompt-groomer/tree/main/benchmark/simple#real-benchmark-results)
+    [See benchmark results →](https://github.com/JacobHuang91/prompt-groomer/tree/main/benchmark/custom#real-benchmark-results)
 
 ## Status
 

@@ -4,9 +4,9 @@ This directory contains different benchmarking approaches to validate the cost-e
 
 ## 📊 Available Benchmarks
 
-### [`simple/`](simple/) - Direct LLM Comparison
+### [`custom/`](custom/) - Custom A/B Testing
 
-A straightforward A/B testing approach that compares raw vs groomed prompts:
+A custom A/B testing approach that compares raw vs groomed prompts:
 - Tests 3 grooming strategies (minimal, standard, aggressive)
 - Uses 30 curated test cases (SQuAD + RAG scenarios)
 - Measures token reduction and response quality
@@ -16,7 +16,7 @@ A straightforward A/B testing approach that compares raw vs groomed prompts:
 
 **When to use**: Quick validation, proving concept, establishing baseline metrics
 
-[→ See simple benchmark documentation](simple/README.md)
+[→ See custom benchmark documentation](custom/README.md)
 
 ---
 
@@ -29,14 +29,14 @@ A straightforward A/B testing approach that compares raw vs groomed prompts:
 
 2. **Set up API key**:
    ```bash
-   cd benchmark/simple
+   cd benchmark/custom
    cp .env.example .env
    # Edit .env and add your OPENAI_API_KEY
    ```
 
 3. **Run a benchmark**:
    ```bash
-   cd simple
+   cd custom
    python benchmark.py
    ```
 
@@ -44,8 +44,9 @@ A straightforward A/B testing approach that compares raw vs groomed prompts:
 
 | Benchmark | Speed | Cost | Accuracy | Best For |
 |-----------|-------|------|----------|----------|
-| **simple** | Fast | Low | Good | Quick validation, CI/CD |
-| *(more coming)* | - | - | - | - |
+| **custom** | Fast | Low | Good | Quick validation, CI/CD |
+| **promptfoo** | - | - | - | *(coming soon)* |
+| **ragas** | - | - | - | *(coming soon)* |
 
 ## 🤝 Contributing
 

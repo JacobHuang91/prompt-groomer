@@ -79,7 +79,7 @@ export OPENAI_API_KEY="your-api-key-here"
 Run the full benchmark with default settings:
 
 ```bash
-cd benchmark/simple
+cd benchmark/custom
 python benchmark.py
 ```
 
