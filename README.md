@@ -11,6 +11,7 @@
 [![License](https://img.shields.io/github/license/JacobHuang91/prompt-groomer)](https://github.com/JacobHuang91/prompt-groomer/blob/main/LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://jacobhuang91.github.io/prompt-groomer/)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/Xinghao91/prompt-groomer)
 
 </div>
 
