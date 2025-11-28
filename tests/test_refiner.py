@@ -1,6 +1,6 @@
 """Tests for Refiner pipeline."""
 
-from prompt_refiner import Refiner, NormalizeWhitespace, StripHTML, TruncateTokens
+from prompt_refiner import NormalizeWhitespace, Refiner, StripHTML, TruncateTokens
 
 
 def test_refiner_single_operation():
