@@ -24,6 +24,10 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+# Precise token counting with tiktoken
+token = [
+    "tiktoken>=0.7.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
