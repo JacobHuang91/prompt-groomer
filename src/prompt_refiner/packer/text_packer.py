@@ -19,6 +19,7 @@ class TextFormat(str, Enum):
                   optimized for base models to reduce token overhead
         XML: Use <role>content</role> tags (Anthropic best practice)
     """
+
     RAW = "raw"
     MARKDOWN = "markdown"
     XML = "xml"

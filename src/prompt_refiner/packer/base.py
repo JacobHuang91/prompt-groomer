@@ -30,6 +30,7 @@ class PackableItem:
         insertion_index: Order in which item was added
         role: Optional role for message-based APIs (system, user, assistant)
     """
+
     content: str
     tokens: int
     priority: int

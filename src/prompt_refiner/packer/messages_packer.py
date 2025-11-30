@@ -88,10 +88,7 @@ class MessagesPacker(BasePacker):
         for item in selected_items:
             # Default to 'user' role if not specified
             role = item.role or "user"
-            messages.append({
-                "role": role,
-                "content": item.content
-            })
+            messages.append({"role": role, "content": item.content})
 
         logger.info(f"Packed {len(messages)} messages for chat API")
         return messages
