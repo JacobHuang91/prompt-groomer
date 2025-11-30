@@ -1355,15 +1355,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#contextpacker-operation" class="md-nav__link">
+  <a href="#overview-v013" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ContextPacker Operation
+        Overview (v0.1.3+)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ContextPacker Operation">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#messagespacker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MessagesPacker
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MessagesPacker">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1378,6 +1389,72 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rag-conversation-history-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RAG + Conversation History Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#textpacker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TextPacker
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TextPacker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#text-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text Formats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-example-with-grouped-sections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RAG Example with Grouped Sections
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#priority-constants" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1387,17 +1464,18 @@
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#rag-example" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#common-features" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RAG Example
+        Common Features
       
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Common Features">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#jit-refinement" class="md-nav__link">
@@ -1460,10 +1538,60 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#token-overhead-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token Overhead Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Token Overhead Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#messagespacker_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MessagesPacker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#textpacker-markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TextPacker (MARKDOWN)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#use-cases" class="md-nav__link">
     <span class="md-ellipsis">
       
         Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-in-v013" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New in v0.1.3
       
     </span>
   </a>
@@ -1492,141 +1620,260 @@
 
 <h1 id="packer-module">Packer Module</h1>
 <p>Intelligently manage context budgets with priority-based item packing for RAG applications and context window management.</p>
-<h2 id="contextpacker-operation">ContextPacker Operation</h2>
-<p>Pack text items into a token budget using a greedy algorithm that respects priorities and maintains insertion order.</p>
+<h2 id="overview-v013">Overview (v0.1.3+)</h2>
+<p>The Packer module provides two specialized packers following the Single Responsibility Principle:</p>
+<ul>
+<li><strong><code>MessagesPacker</code></strong>: For chat completion APIs (OpenAI, Anthropic)</li>
+<li><strong><code>TextPacker</code></strong>: For text completion APIs (Llama Base, GPT-3)</li>
+</ul>
+<h2 id="messagespacker">MessagesPacker</h2>
+<p>Pack items into chat message format for chat completion APIs.</p>
 <h3 id="basic-usage">Basic Usage</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextPacker</span><span class="p">,</span> <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span> <span class="n">PRIORITY_USER</span><span class="p">,</span> <span class="n">PRIORITY_HIGH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagesPacker</span><span class="p">,</span> <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span> <span class="n">PRIORITY_USER</span><span class="p">,</span> <span class="n">PRIORITY_HIGH</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Create packer with token budget</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">ContextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Add items with priorities</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Add items with priorities and roles</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;You are a helpful assistant.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="s2">&quot;What are the key features?&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">)</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="s2">&quot;Product documentation: Feature A, B, C...&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="p">)</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="c1"># Pack items into budget</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="n">result</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">separator</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="s2">&quot;What are the key features?&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p">)</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="s2">&quot;Product documentation: Feature A, B, C...&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="p">)</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="c1"># Pack into messages format</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="n">messages</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># Returns List[Dict[str, str]]</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="c1"># Use directly with chat APIs</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="c1"># response = client.chat.completions.create(messages=messages)</span>
 </code></pre></div>
-<h3 id="priority-constants">Priority Constants</h3>
+<h3 id="rag-conversation-history-example">RAG + Conversation History Example</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span>   <span class="c1"># 0 - Absolute must-have (system prompts)</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">PRIORITY_USER</span><span class="p">,</span>     <span class="c1"># 10 - Critical user input</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">PRIORITY_HIGH</span><span class="p">,</span>     <span class="c1"># 20 - Important context (core RAG docs)</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">PRIORITY_MEDIUM</span><span class="p">,</span>   <span class="c1"># 30 - Normal priority (general RAG docs)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">PRIORITY_LOW</span><span class="p">,</span>      <span class="c1"># 40 - Optional content (old history)</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">MessagesPacker</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">PRIORITY_USER</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">PRIORITY_HIGH</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">PRIORITY_LOW</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">StripHTML</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1"># System prompt (must include)</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="s2">&quot;Answer based on the provided context.&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="p">)</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="c1"># RAG documents with JIT cleaning</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    <span class="s2">&quot;&lt;p&gt;Prompt-refiner is a library...&lt;/p&gt;&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">,</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="n">StripHTML</span><span class="p">()</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="p">)</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="c1"># Old conversation history (can be dropped if needed)</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="n">old_messages</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;What is this library?&quot;</span><span class="p">},</span>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;It&#39;s a tool for optimizing prompts.&quot;</span><span class="p">}</span>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="p">]</span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_messages</span><span class="p">(</span><span class="n">old_messages</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_LOW</span><span class="p">)</span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="c1"># Current query (must include)</span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>    <span class="s2">&quot;How does it reduce costs?&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span>
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="p">)</span>
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>
+<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="c1"># Pack into messages</span>
+<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="n">messages</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># List[Dict[str, str]]</span>
 </code></pre></div>
-<h3 id="rag-example">RAG Example</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">ContextPacker</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">PRIORITY_USER</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">PRIORITY_HIGH</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">PRIORITY_MEDIUM</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">StripHTML</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">ContextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="c1"># System prompt (must include)</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="s2">&quot;Answer based on the provided context.&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">)</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="c1"># User query (must include)</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>    <span class="s2">&quot;What is prompt-refiner?&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="p">)</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="c1"># Retrieved documents with cleaning</span>
-<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
-<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>    <span class="s2">&quot;&lt;p&gt;Prompt-refiner is a library...&lt;/p&gt;&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">,</span>
-<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="n">StripHTML</span><span class="p">()</span>  <span class="c1"># Clean before packing</span>
-<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="p">)</span>
-<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>
-<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
-<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>    <span class="s2">&quot;Additional context about features...&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_MEDIUM</span>
-<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="p">)</span>
-<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>
-<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="c1"># Pack into final context</span>
-<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="n">context</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+<h2 id="textpacker">TextPacker</h2>
+<p>Pack items into formatted text for text completion APIs (base models).</p>
+<h3 id="basic-usage_1">Basic Usage</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextPacker</span><span class="p">,</span> <span class="n">TextFormat</span><span class="p">,</span> <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span> <span class="n">PRIORITY_HIGH</span><span class="p">,</span> <span class="n">PRIORITY_USER</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Create packer with MARKDOWN format</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">TextPacker</span><span class="p">(</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">text_format</span><span class="o">=</span><span class="n">TextFormat</span><span class="o">.</span><span class="n">MARKDOWN</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># Add items</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="s2">&quot;You are a helpful assistant.&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">)</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    <span class="s2">&quot;Product documentation...&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="p">)</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    <span class="s2">&quot;What are the key features?&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="p">)</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="c1"># Pack into formatted text</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="n">prompt</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># Returns str</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="c1"># Use with completion APIs</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="c1"># response = client.completions.create(prompt=prompt)</span>
 </code></pre></div>
+<h3 id="text-formats">Text Formats</h3>
+<p><strong>RAW Format</strong> (default):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">TextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">text_format</span><span class="o">=</span><span class="n">TextFormat</span><span class="o">.</span><span class="n">RAW</span><span class="p">)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># Output: Simple concatenation with separators</span>
+</code></pre></div></p>
+<p><strong>MARKDOWN Format</strong> (recommended for base models):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">TextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">text_format</span><span class="o">=</span><span class="n">TextFormat</span><span class="o">.</span><span class="n">MARKDOWN</span><span class="p">)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># Output:</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1"># ### INSTRUCTIONS:</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># System prompt</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1">#</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># ### CONTEXT:</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># - Document 1</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1"># - Document 2</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1">#</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1"># ### CONVERSATION:</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># User: Hello</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="c1"># Assistant: Hi</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="c1">#</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="c1"># ### INPUT:</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="c1"># Final query</span>
+</code></pre></div></p>
+<p><strong>XML Format</strong> (Anthropic best practice):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">TextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">text_format</span><span class="o">=</span><span class="n">TextFormat</span><span class="o">.</span><span class="n">XML</span><span class="p">)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Output: &lt;role&gt;content&lt;/role&gt; tags</span>
+</code></pre></div></p>
+<h3 id="rag-example-with-grouped-sections">RAG Example with Grouped Sections</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">TextPacker</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">TextFormat</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">PRIORITY_HIGH</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">PRIORITY_MEDIUM</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">PRIORITY_USER</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">StripHTML</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">)</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">TextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">text_format</span><span class="o">=</span><span class="n">TextFormat</span><span class="o">.</span><span class="n">MARKDOWN</span><span class="p">)</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1"># System prompt</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="s2">&quot;Answer based on context.&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="p">)</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="c1"># RAG documents (no role = context)</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>    <span class="s2">&quot;&lt;p&gt;Document 1...&lt;/p&gt;&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">,</span>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="n">StripHTML</span><span class="p">()</span>
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="p">)</span>
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>    <span class="s2">&quot;Document 2...&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_MEDIUM</span>
+<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="p">)</span>
+<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>
+<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="c1"># User query</span>
+<a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a>    <span class="s2">&quot;What is the answer?&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span>
+<a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a><span class="p">)</span>
+<a id="__codelineno-6-38" name="__codelineno-6-38" href="#__codelineno-6-38"></a>
+<a id="__codelineno-6-39" name="__codelineno-6-39" href="#__codelineno-6-39"></a><span class="n">prompt</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># str</span>
+</code></pre></div>
+<h2 id="priority-constants">Priority Constants</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span>   <span class="c1"># 0 - Absolute must-have (system prompts)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">PRIORITY_USER</span><span class="p">,</span>     <span class="c1"># 10 - Critical user input</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">PRIORITY_HIGH</span><span class="p">,</span>     <span class="c1"># 20 - Important context (core RAG docs)</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">PRIORITY_MEDIUM</span><span class="p">,</span>   <span class="c1"># 30 - Normal priority (general RAG docs)</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">PRIORITY_LOW</span><span class="p">,</span>      <span class="c1"># 40 - Optional content (old history)</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">)</span>
+</code></pre></div>
+<h2 id="common-features">Common Features</h2>
 <h3 id="jit-refinement">JIT Refinement</h3>
-<p>Apply operations to items before adding them to the packer:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">ContextPacker</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">PRIORITY_HIGH</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">StripHTML</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">NormalizeWhitespace</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">ContextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">dirty_html</span> <span class="o">=</span> <span class="s2">&quot;&lt;div&gt;  Lots   of   spaces  &lt;/div&gt;&quot;</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1"># Clean before packing for accurate token counting</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="n">dirty_html</span><span class="p">,</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">,</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="p">[</span><span class="n">StripHTML</span><span class="p">(),</span> <span class="n">NormalizeWhitespace</span><span class="p">()]</span>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">)</span>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="n">result</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+<p>Apply operations before adding items:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">StripHTML</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="s2">&quot;&lt;div&gt;  Messy   HTML  &lt;/div&gt;&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">,</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="p">[</span><span class="n">StripHTML</span><span class="p">(),</span> <span class="n">NormalizeWhitespace</span><span class="p">()]</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="method-chaining">Method Chaining</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">result</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">ContextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;System prompt&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span><span class="p">)</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;User query&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span><span class="p">)</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;Context doc&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">)</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="o">.</span><span class="n">pack</span><span class="p">()</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">messages</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;System prompt&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span><span class="p">)</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;User query&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span><span class="p">)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="inspection">Inspection</h3>
-<p>Check what items were added before packing:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">ContextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;Item 1&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span><span class="p">)</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;Item 2&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span><span class="p">)</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">items</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Priority: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, Tokens: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;tokens&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Item 1&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span><span class="p">)</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Item 2&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_USER</span><span class="p">)</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">items</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Priority: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, Tokens: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;tokens&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="reset">Reset</h3>
-<p>Clear all items and reuse the packer:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">ContextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;First batch&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">)</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">result1</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1"># Clear and reuse</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">packer</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">packer</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;Second batch&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">)</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">result2</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;First batch&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">)</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">messages1</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="c1"># Clear and reuse</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">packer</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Second batch&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">)</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="n">messages2</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
 </code></pre></div>
 <h2 id="how-it-works">How It Works</h2>
 <ol>
-<li><strong>Add items</strong> with priorities and optional JIT refinement</li>
+<li><strong>Add items</strong> with priorities, roles, and optional JIT refinement</li>
 <li><strong>Sort by priority</strong> (lower number = higher priority)</li>
 <li><strong>Greedy packing</strong> - select items that fit within budget</li>
 <li><strong>Restore insertion order</strong> for natural reading flow</li>
-<li><strong>Join with separator</strong> and return packed text</li>
+<li><strong>Format output</strong>:</li>
+<li>MessagesPacker: Returns <code>List[Dict[str, str]]</code></li>
+<li>TextPacker: Returns <code>str</code> (formatted based on text_format)</li>
 </ol>
+<h2 id="token-overhead-optimization">Token Overhead Optimization</h2>
+<h3 id="messagespacker_1">MessagesPacker</h3>
+<ul>
+<li>Pre-calculates ChatML format overhead (~4 tokens per message)</li>
+<li>100% token budget utilization in precise mode</li>
+</ul>
+<h3 id="textpacker-markdown">TextPacker (MARKDOWN)</h3>
+<ul>
+<li><strong>"Entrance fee" strategy</strong>: Pre-reserves 30 tokens for section headers</li>
+<li><strong>Marginal costs</strong>: Only counts bullet points and newlines per item</li>
+<li><strong>Result</strong>: Fits more documents compared to per-item header calculation</li>
+</ul>
 <h2 id="use-cases">Use Cases</h2>
 <ul>
 <li><strong>RAG Applications</strong>: Pack retrieved documents into context budget</li>
@@ -1634,6 +1881,18 @@
 <li><strong>Context Window Management</strong>: Fit critical information within model limits</li>
 <li><strong>Multi-source Data</strong>: Combine system prompts, user input, and documents</li>
 </ul>
+<h2 id="new-in-v013">New in v0.1.3</h2>
+<p>The Packer module now provides two specialized packers:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagesPacker</span><span class="p">,</span> <span class="n">TextPacker</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1"># For chat APIs (OpenAI, Anthropic)</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">messages_packer</span> <span class="o">=</span> <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="n">messages</span> <span class="o">=</span> <span class="n">messages_packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># List[Dict[str, str]]</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># For completion APIs (Llama Base, GPT-3)</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="n">text_packer</span> <span class="o">=</span> <span class="n">TextPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">text_format</span><span class="o">=</span><span class="n">TextFormat</span><span class="o">.</span><span class="n">MARKDOWN</span><span class="p">)</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="n">text</span> <span class="o">=</span> <span class="n">text_packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># str</span>
+</code></pre></div>
 <p><a class="md-button" href="../../api-reference/packer/">Full API Reference →</a>
 <a class="md-button" href="https://github.com/JacobHuang91/prompt-refiner/tree/main/examples/packer">View Examples</a></p>
 
