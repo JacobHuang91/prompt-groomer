@@ -20,8 +20,13 @@ from prompt_refiner import (
     PRIORITY_HIGH,
     PRIORITY_LOW,
     PRIORITY_MEDIUM,
+    PRIORITY_QUERY,
     PRIORITY_SYSTEM,
-    PRIORITY_USER,
+    ROLE_ASSISTANT,
+    ROLE_CONTEXT,
+    ROLE_QUERY,
+    ROLE_SYSTEM,
+    ROLE_USER,
     StripHTML,
     TextFormat,
     TextPacker,
@@ -46,13 +51,13 @@ def main():
         separator="\n\n",  # Smart default for clarity
     )
 
-    # 1. System prompt (auto priority=0 for role="system")
+    # 1. System prompt (auto priority=0 for ROLE_SYSTEM)
     packer.add(
         "You are a QA assistant. Answer questions based on the provided context.",
-        role="system",  # Auto: PRIORITY_SYSTEM (0)
+        role=ROLE_SYSTEM,  # Auto: PRIORITY_SYSTEM (0)
     )
 
-    # 2. RAG documents with JIT HTML cleaning (auto priority=20 for no role)
+    # 2. RAG documents with JIT HTML cleaning (auto priority=20 for ROLE_CONTEXT)
     doc_html = """
     <div class="doc">
         <h2>TextPacker</h2>
@@ -62,34 +67,34 @@ def main():
     """
     packer.add(
         doc_html,
-        # No role = RAG document, auto: PRIORITY_HIGH (20)
+        role=ROLE_CONTEXT,  # RAG document, auto: PRIORITY_HIGH (20)
         refine_with=StripHTML(),  # Clean HTML before packing
     )
 
     packer.add(
         "The library includes 5 modules: Cleaner, Compressor, Scrubber, Analyzer, and Packer.",
-        # No role = RAG document, auto: PRIORITY_HIGH (20)
+        role=ROLE_CONTEXT,  # RAG document, auto: PRIORITY_HIGH (20)
     )
 
     # 3. Conversation history (auto priority=40 for history)
     conversation_history = [
-        {"role": "user", "content": "What is prompt-refiner?"},
-        {"role": "assistant", "content": "It's a Python library for optimizing LLM inputs."},
-        {"role": "user", "content": "Does it reduce costs?"},
-        {"role": "assistant", "content": "Yes, by removing unnecessary tokens it can save 10-20% on API costs."},
+        {"role": ROLE_USER, "content": "What is prompt-refiner?"},
+        {"role": ROLE_ASSISTANT, "content": "It's a Python library for optimizing LLM inputs."},
+        {"role": ROLE_USER, "content": "Does it reduce costs?"},
+        {"role": ROLE_ASSISTANT, "content": "Yes, by removing unnecessary tokens it can save 10-20% on API costs."},
     ]
     packer.add_messages(conversation_history)  # Auto: PRIORITY_LOW (40) for history
 
-    # 4. Recent context (user role = auto priority=10)
+    # 4. Recent context (ROLE_USER from history = auto priority=40)
     packer.add(
         "I'm working with Llama-2-base and need efficient context management.",
-        role="user",  # Auto: PRIORITY_USER (10)
+        role=ROLE_USER,  # Conversation history, auto: PRIORITY_LOW (40)
     )
 
-    # 5. Current query (user role = auto priority=10)
+    # 5. Current query (ROLE_QUERY = auto priority=10)
     packer.add(
         "What is TextPacker and how does it work?",
-        role="user",  # Auto: PRIORITY_USER (10)
+        role=ROLE_QUERY,  # Current user query, auto: PRIORITY_QUERY (10)
     )
 
     # Pack into text format

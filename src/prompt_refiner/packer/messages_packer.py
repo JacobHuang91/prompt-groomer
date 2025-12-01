@@ -3,7 +3,7 @@
 import logging
 from typing import Dict, List, Optional
 
-from .base import BasePacker, PackableItem
+from .base import ROLE_CONTEXT, ROLE_QUERY, BasePacker, PackableItem
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +83,14 @@ class MessagesPacker(BasePacker):
         """
         Pack items into message format for chat APIs.
 
+        Automatically maps semantic roles to API-compatible roles:
+        - ROLE_CONTEXT → "user" (RAG documents as user-provided context)
+        - ROLE_QUERY → "user" (current user question)
+        - Other roles (system, user, assistant) remain unchanged
+
         Returns:
-            List of message dictionaries with 'role' and 'content' keys.
-            Items without role default to 'user'.
+            List of message dictionaries with 'role' and 'content' keys,
+            ready for OpenAI, Anthropic, and other chat completion APIs.
 
         Example:
             >>> messages = packer.pack()
@@ -99,9 +104,18 @@ class MessagesPacker(BasePacker):
 
         messages = []
         for item in selected_items:
-            # Default to 'user' role if not specified
-            role = item.role or "user"
-            messages.append({"role": role, "content": item.content})
+            # Map semantic roles to API-compatible roles
+            api_role = item.role
+
+            if item.role == ROLE_CONTEXT:
+                # RAG documents become user messages (context provided by user)
+                api_role = "user"
+            elif item.role == ROLE_QUERY:
+                # Current query becomes user message
+                api_role = "user"
+            # Other roles (system, user, assistant) remain unchanged
+
+            messages.append({"role": api_role, "content": item.content})
 
         logger.info(f"Packed {len(messages)} messages for chat API")
         return messages

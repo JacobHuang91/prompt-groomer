@@ -12,10 +12,17 @@ logger = logging.getLogger(__name__)
 
 # Priority constants - lower values = higher priority
 PRIORITY_SYSTEM = 0  # Absolute must-have (e.g., system prompts)
-PRIORITY_USER = 10  # Critical user input
+PRIORITY_QUERY = 10  # Current user query (critical for response)
 PRIORITY_HIGH = 20  # Important context (e.g., core RAG documents)
 PRIORITY_MEDIUM = 30  # Normal priority (e.g., general RAG documents)
 PRIORITY_LOW = 40  # Optional content (e.g., old conversation history)
+
+# Semantic roles for RAG applications
+ROLE_SYSTEM = "system"  # System instructions (P0, highest priority)
+ROLE_QUERY = "query"  # Current user question (P10, high priority)
+ROLE_CONTEXT = "context"  # RAG retrieved documents (P20, medium-high priority)
+ROLE_USER = "user"  # User messages in conversation history (P40, low priority)
+ROLE_ASSISTANT = "assistant"  # Assistant messages in history (P40, low priority)
 
 
 @dataclass
@@ -87,7 +94,7 @@ class BasePacker(ABC):
     def add(
         self,
         content: str,
-        role: Optional[str] = None,
+        role: str,
         priority: Optional[int] = None,
         refine_with: Optional[Union[Operation, List[Operation]]] = None,
     ) -> "BasePacker":
@@ -96,27 +103,35 @@ class BasePacker(ABC):
 
         Args:
             content: Text content to add
-            role: Optional role for message APIs (system, user, assistant)
+            role: Semantic role (required). Use ROLE_* constants:
+                - ROLE_SYSTEM: System instructions
+                - ROLE_QUERY: Current user question
+                - ROLE_CONTEXT: RAG retrieved documents
+                - ROLE_USER: User messages in conversation history
+                - ROLE_ASSISTANT: Assistant messages in history
             priority: Priority level (use PRIORITY_* constants). If None, infers from role:
-                - role="system" → PRIORITY_SYSTEM (0)
-                - role="user" → PRIORITY_USER (10)
-                - role=None → PRIORITY_HIGH (20) - for RAG documents
-                - role="assistant" or other → PRIORITY_MEDIUM (30)
+                - ROLE_SYSTEM → PRIORITY_SYSTEM (0)
+                - ROLE_QUERY → PRIORITY_QUERY (10)
+                - ROLE_CONTEXT → PRIORITY_HIGH (20)
+                - ROLE_USER/ROLE_ASSISTANT → PRIORITY_LOW (40)
+                - Other roles → PRIORITY_MEDIUM (30)
             refine_with: Optional operation(s) to apply before adding
 
         Returns:
             Self for method chaining
         """
-        # Smart priority defaults based on role
+        # Smart priority defaults based on semantic roles
         if priority is None:
-            if role == "system":
+            if role == ROLE_SYSTEM:
                 priority = PRIORITY_SYSTEM  # 0 - Highest priority
-            elif role == "user":
-                priority = PRIORITY_USER  # 10 - User queries are critical
-            elif role is None:
-                priority = PRIORITY_HIGH  # 20 - RAG documents (no role)
+            elif role == ROLE_QUERY:
+                priority = PRIORITY_QUERY  # 10 - Current query is critical
+            elif role == ROLE_CONTEXT:
+                priority = PRIORITY_HIGH  # 20 - RAG documents
+            elif role in (ROLE_USER, ROLE_ASSISTANT):
+                priority = PRIORITY_LOW  # 40 - Conversation history
             else:
-                priority = PRIORITY_MEDIUM  # 30 - Assistant and other roles
+                priority = PRIORITY_MEDIUM  # 30 - Unknown roles
 
         # JIT refinement
         if refine_with:
@@ -187,25 +202,28 @@ class BasePacker(ABC):
         Select items using greedy algorithm based on priorities.
 
         Algorithm:
-        1. Sort items by priority (lower value = higher priority)
-        2. If max_tokens is None, include all items
+        1. Sort items by priority (lower value = higher priority, stable sort)
+        2. If max_tokens is None, return all sorted items (maintains priority order)
         3. Otherwise, greedily select items that fit within budget (including overhead)
-        4. Restore insertion order for natural reading flow
+        4. Restore insertion order for natural reading flow (limited mode only)
 
         Returns:
-            List of selected items in insertion order
+            List of selected items:
+            - Unlimited mode: Sorted by (priority, insertion_index)
+            - Limited mode: Restored to insertion order after selection
         """
         if not self._items:
             return []
 
-        # Unlimited mode: include all items
-        if self.effective_max_tokens is None:
-            logger.info(f"Unlimited mode: packed all {len(self._items)} items")
-            return list(self._items)
-
         # Sort by priority (stable sort preserves insertion order for equal priorities)
         sorted_items = sorted(self._items, key=lambda x: (x.priority, x.insertion_index))
 
+        # Unlimited mode: include all items (sorted by priority)
+        if self.effective_max_tokens is None:
+            logger.info(f"Unlimited mode: packed all {len(self._items)} items (sorted by priority)")
+            return sorted_items
+
+        # Limited mode: greedy selection
         selected: List[PackableItem] = []
         current_tokens = 0
 
