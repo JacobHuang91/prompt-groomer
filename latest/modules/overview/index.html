@@ -778,15 +778,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-5-core-modules" class="md-nav__link">
+  <a href="#the-4-core-modules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The 5 Core Modules
+        The 4 Core Modules
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The 5 Core Modules">
+    <nav class="md-nav" aria-label="The 4 Core Modules">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -823,21 +823,38 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-analyzer-show-value" class="md-nav__link">
+  <a href="#4-packer-context-budget-management" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Analyzer - Show Value
+        4. Packer - Context Budget Management
       
     </span>
   </a>
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#5-packer-context-budget-management" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measurement-utilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Packer - Context Budget Management
+        Measurement Utilities
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Measurement Utilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analyzer-measure-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyzer - Measure Impact
       
     </span>
   </a>
@@ -1546,15 +1563,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-5-core-modules" class="md-nav__link">
+  <a href="#the-4-core-modules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The 5 Core Modules
+        The 4 Core Modules
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The 5 Core Modules">
+    <nav class="md-nav" aria-label="The 4 Core Modules">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1591,21 +1608,38 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-analyzer-show-value" class="md-nav__link">
+  <a href="#4-packer-context-budget-management" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Analyzer - Show Value
+        4. Packer - Context Budget Management
       
     </span>
   </a>
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#5-packer-context-budget-management" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measurement-utilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Packer - Context Budget Management
+        Measurement Utilities
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Measurement Utilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analyzer-measure-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyzer - Measure Impact
       
     </span>
   </a>
@@ -1699,8 +1733,8 @@
 
 
 <h1 id="modules-overview">Modules Overview</h1>
-<p>Prompt Refiner is organized into 5 specialized modules, each designed to handle a specific aspect of prompt optimization.</p>
-<h2 id="the-5-core-modules">The 5 Core Modules</h2>
+<p>Prompt Refiner is organized into 4 core transformation modules plus measurement utilities.</p>
+<h2 id="the-4-core-modules">The 4 Core Modules</h2>
 <h3 id="1-cleaner-clean-dirty-data">1. Cleaner - Clean Dirty Data</h3>
 <p>The Cleaner module removes unwanted artifacts from your text.</p>
 <p><strong>Operations:</strong></p>
@@ -1708,11 +1742,13 @@
 <li><strong><a href="../../api-reference/cleaner/#striphtml">StripHTML</a></strong> - Remove or convert HTML tags</li>
 <li><strong><a href="../../api-reference/cleaner/#normalizewhitespace">NormalizeWhitespace</a></strong> - Collapse excessive whitespace</li>
 <li><strong><a href="../../api-reference/cleaner/#fixunicode">FixUnicode</a></strong> - Remove problematic Unicode characters</li>
+<li><strong><a href="../../api-reference/cleaner/#jsoncleaner">JsonCleaner</a></strong> - Strip nulls/empties from JSON, minify</li>
 </ul>
 <p><strong>When to use:</strong></p>
 <ul>
 <li>Processing web-scraped content</li>
 <li>Cleaning user-generated text</li>
+<li>Compressing JSON from RAG APIs</li>
 <li>Normalizing text from various sources</li>
 </ul>
 <p><a class="md-button" href="../cleaner/">Learn more →</a></p>
@@ -1743,20 +1779,7 @@
 <li>Protecting user data in logs</li>
 </ul>
 <p><a class="md-button" href="../scrubber/">Learn more →</a></p>
-<h3 id="4-analyzer-show-value">4. Analyzer - Show Value</h3>
-<p>The Analyzer module tracks optimization impact.</p>
-<p><strong>Operations:</strong></p>
-<ul>
-<li><strong><a href="../../api-reference/analyzer/#counttokens">CountTokens</a></strong> - Measure token savings and calculate ROI</li>
-</ul>
-<p><strong>When to use:</strong></p>
-<ul>
-<li>Demonstrating cost savings</li>
-<li>A/B testing optimization strategies</li>
-<li>Monitoring optimization impact</li>
-</ul>
-<p><a class="md-button" href="../analyzer/">Learn more →</a></p>
-<h3 id="5-packer-context-budget-management">5. Packer - Context Budget Management</h3>
+<h3 id="4-packer-context-budget-management">4. Packer - Context Budget Management</h3>
 <p>The Packer module manages context budgets with intelligent priority-based item selection.</p>
 <p><strong>Operations:</strong></p>
 <ul>
@@ -1771,6 +1794,23 @@
 <li>Combining system prompts, user input, and documents</li>
 </ul>
 <p><a class="md-button" href="../packer/">Learn more →</a></p>
+<hr />
+<h2 id="measurement-utilities">Measurement Utilities</h2>
+<h3 id="analyzer-measure-impact">Analyzer - Measure Impact</h3>
+<p>The Analyzer module <strong>measures optimization impact but does not transform prompts</strong>. Use it to track token savings and demonstrate ROI.</p>
+<p><strong>Operations:</strong></p>
+<ul>
+<li><strong><a href="../../api-reference/analyzer/#counttokens">CountTokens</a></strong> - Measure token savings and calculate ROI</li>
+</ul>
+<p><strong>When to use:</strong></p>
+<ul>
+<li>Demonstrating cost savings to stakeholders</li>
+<li>A/B testing optimization strategies</li>
+<li>Monitoring optimization impact over time</li>
+<li>Calculating ROI for prompt optimization</li>
+</ul>
+<p><a class="md-button" href="../analyzer/">Learn more →</a></p>
+<hr />
 <h2 id="combining-modules">Combining Modules</h2>
 <p>The real power comes from combining modules:</p>
 <h3 id="pipeline-example">Pipeline Example</h3>
@@ -1841,18 +1881,19 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    A[Raw Input] --&gt; B[Cleaner]
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    B --&gt; C[Compressor]
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    C --&gt; D[Scrubber]
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    D --&gt; E[Analyzer]
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    E --&gt; F[Optimized Output]
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    D --&gt; E[Optimized Output]
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    E -.-&gt; F[Analyzer&lt;br/&gt;Measurement Only]
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    G[Multiple Items] --&gt; H[Packer]
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    H --&gt; I[Packed Context]
 </code></pre></div>
+<p><strong>Note:</strong> Analyzer (dotted line) measures but doesn't transform the output.</p>
 <h2 id="best-practices">Best Practices</h2>
 <ol>
 <li><strong>Order matters</strong>: Clean before compressing, compress before redacting</li>
 <li><strong>Use Packer for RAG</strong>: When managing multiple documents with priorities</li>
 <li><strong>Test your pipeline</strong>: Different inputs may need different operations</li>
-<li><strong>Measure impact</strong>: Use CountTokens to track savings</li>
+<li><strong>Measure, don't transform</strong>: Use CountTokens to track savings without changing output</li>
 <li><strong>Start simple</strong>: Begin with one module and add more as needed</li>
 </ol>
 

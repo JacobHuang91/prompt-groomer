@@ -861,6 +861,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#jsoncleaner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonCleaner
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -894,6 +905,17 @@
     <span class="md-ellipsis">
       
         Text Normalization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-context-compression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RAG Context Compression
       
     </span>
   </a>
@@ -1579,6 +1601,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#jsoncleaner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonCleaner
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1612,6 +1645,17 @@
     <span class="md-ellipsis">
       
         Text Normalization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-context-compression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RAG Context Compression
       
     </span>
   </a>
@@ -1662,6 +1706,7 @@
 <li>HTML tags from web scraping</li>
 <li>Excessive whitespace and formatting issues</li>
 <li>Problematic Unicode characters</li>
+<li>JSON with null values and empty containers</li>
 </ul>
 <p>The Cleaner module addresses these issues efficiently.</p>
 <h2 id="operations">Operations</h2>
@@ -1719,23 +1764,63 @@
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Output: &quot;HelloWorld&quot;</span>
 </code></pre></div>
 <p><a class="md-button" href="../../api-reference/cleaner/#fixunicode">Full API Reference →</a></p>
+<h3 id="jsoncleaner">JsonCleaner</h3>
+<p>Clean and minify JSON by removing null values and empty containers.</p>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>RAG API responses with null/empty fields</li>
+<li>Compressing JSON context before LLM input</li>
+<li>Normalizing inconsistent API data</li>
+<li>Token optimization for JSON-heavy prompts</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonCleaner</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Strip nulls and empty containers</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">cleaner</span> <span class="o">=</span> <span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">dirty_json</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="s2">{</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="s2">    &quot;name&quot;: &quot;Alice&quot;,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="s2">    &quot;age&quot;: null,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="s2">    &quot;address&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="s2">    &quot;tags&quot;: []</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="s2">}</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="s2">&quot;&quot;&quot;</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">result</span> <span class="o">=</span> <span class="n">cleaner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dirty_json</span><span class="p">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># Output: {&quot;name&quot;:&quot;Alice&quot;}</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="c1"># Only minify (keep all data)</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="n">cleaner</span> <span class="o">=</span> <span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="n">result</span> <span class="o">=</span> <span class="n">cleaner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dirty_json</span><span class="p">)</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="c1"># Output: {&quot;name&quot;:&quot;Alice&quot;,&quot;age&quot;:null,&quot;address&quot;:{},&quot;tags&quot;:[]}</span>
+</code></pre></div>
+<p><strong>Token savings:</strong> 50-60% reduction in typical RAG API responses!</p>
+<p><a class="md-button" href="../../api-reference/cleaner/#jsoncleaner">Full API Reference →</a></p>
 <h2 id="common-patterns">Common Patterns</h2>
 <h3 id="web-content-pipeline">Web Content Pipeline</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">StripHTML</span><span class="p">,</span> <span class="n">FixUnicode</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">web_cleaner</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">StripHTML</span><span class="p">(</span><span class="n">to_markdown</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="o">|</span> <span class="n">FixUnicode</span><span class="p">()</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="o">|</span> <span class="n">NormalizeWhitespace</span><span class="p">()</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">StripHTML</span><span class="p">,</span> <span class="n">FixUnicode</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">web_cleaner</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">StripHTML</span><span class="p">(</span><span class="n">to_markdown</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="o">|</span> <span class="n">FixUnicode</span><span class="p">()</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="o">|</span> <span class="n">NormalizeWhitespace</span><span class="p">()</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="text-normalization">Text Normalization</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">FixUnicode</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">normalizer</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">FixUnicode</span><span class="p">()</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="o">|</span> <span class="n">NormalizeWhitespace</span><span class="p">()</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">FixUnicode</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">normalizer</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">FixUnicode</span><span class="p">()</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="o">|</span> <span class="n">NormalizeWhitespace</span><span class="p">()</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">)</span>
+</code></pre></div>
+<h3 id="rag-context-compression">RAG Context Compression</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonCleaner</span><span class="p">,</span> <span class="n">TruncateTokens</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">rag_compressor</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="o">|</span> <span class="n">TruncateTokens</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">)</span>
 </code></pre></div>
 <h2 id="next-steps">Next Steps</h2>
 <ul>

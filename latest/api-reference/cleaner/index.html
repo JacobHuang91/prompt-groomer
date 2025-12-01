@@ -1252,6 +1252,79 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#jsoncleaner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonCleaner
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="JsonCleaner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt_refiner.cleaner.JsonCleaner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonCleaner
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="JsonCleaner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt_refiner.cleaner.JsonCleaner-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt_refiner.cleaner.JsonCleaner.process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-use-cases" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1279,6 +1352,17 @@
     <span class="md-ellipsis">
       
         Text Normalization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-json-compression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RAG JSON Compression
       
     </span>
   </a>
@@ -1890,6 +1974,79 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#jsoncleaner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonCleaner
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="JsonCleaner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt_refiner.cleaner.JsonCleaner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonCleaner
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="JsonCleaner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt_refiner.cleaner.JsonCleaner-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt_refiner.cleaner.JsonCleaner.process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-use-cases" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1923,6 +2080,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#rag-json-compression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RAG JSON Compression
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1949,7 +2117,7 @@
 
 
 <h1 id="cleaner-module">Cleaner Module</h1>
-<p>The Cleaner module provides operations for cleaning dirty data, including HTML removal, whitespace normalization, and Unicode fixing.</p>
+<p>The Cleaner module provides operations for cleaning dirty data, including HTML removal, whitespace normalization, Unicode fixing, and JSON compression.</p>
 <h2 id="striphtml">StripHTML</h2>
 <p>Remove HTML tags from text, with options to preserve semantic tags or convert to Markdown.</p>
 
@@ -2739,25 +2907,410 @@
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">fixer</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="s2">&quot;Hello</span><span class="se">\u200b</span><span class="s2">World&quot;</span><span class="p">)</span>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1"># Output: &quot;HelloWorld&quot;</span>
 </code></pre></div>
+<hr />
+<h2 id="jsoncleaner">JsonCleaner</h2>
+<p>Clean and minify JSON by removing null values and empty containers.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="prompt_refiner.cleaner.JsonCleaner" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">prompt_refiner.cleaner.JsonCleaner</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="prompt_refiner.operation.Operation">Operation</span></code></p>
+
+
+
+        <p>Cleans and minifies JSON strings.
+Removes null values, empty containers, and extra whitespace.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>strip_nulls</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, remove null/None values from objects and arrays (default: True)</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>strip_empty</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, remove empty dicts, lists, and strings (default: True)</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>from prompt_refiner import JsonCleaner
+cleaner = JsonCleaner(strip_nulls=True, strip_empty=True)</p>
+<p _name_:_Alice_="&quot;name&quot;:&quot;Alice&quot;">dirty_json = '''
+... {
+...   "name": "Alice",
+...   "age": null,
+...   "address": {},
+...   "tags": [],
+...   "bio": ""
+... }
+... '''
+result = cleaner.run(dirty_json)
+print(result)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+<details class="use-cases" open>
+  <summary>Use Cases</summary>
+  <ul>
+<li><strong>RAG Context Compression</strong>: Strip nulls/empties from API responses before feeding to LLM</li>
+<li><strong>Cost Optimization</strong>: Reduce token count by removing unnecessary JSON structure</li>
+<li><strong>Data Cleaning</strong>: Normalize JSON from multiple sources with inconsistent null handling</li>
+</ul>
+</details>
+        <p>Initialize JSON cleaner.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>strip_nulls</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Remove null/None values</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>strip_empty</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Remove empty containers (dict, list, str)</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>src/prompt_refiner/cleaner/json.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-41">41</a></span>
+<span class="normal"><a href="#__codelineno-0-42">42</a></span>
+<span class="normal"><a href="#__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#__codelineno-0-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strip_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    Initialize JSON cleaner.</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">        strip_nulls: Remove null/None values</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">        strip_empty: Remove empty containers (dict, list, str)</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">strip_nulls</span> <span class="o">=</span> <span class="n">strip_nulls</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">strip_empty</span> <span class="o">=</span> <span class="n">strip_empty</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="prompt_refiner.cleaner.JsonCleaner-functions">Functions</h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="prompt_refiner.cleaner.JsonCleaner.process" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">process</span>
+
+
+</h5>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">process</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Process the input JSON (string or object).
+Returns a minified JSON string.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>text</code>
+            </td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="str">str</span>, <span title="typing.Dict">Dict</span>, <span title="typing.List">List</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JSON string, dict, or list to clean</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minified JSON string with nulls/empties removed</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>If input is not valid JSON, returns input unchanged.</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/prompt_refiner/cleaner/json.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
+<span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
+<span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
+<span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
+<span class="normal"><a href="#__codelineno-0-100">100</a></span>
+<span class="normal"><a href="#__codelineno-0-101">101</a></span>
+<span class="normal"><a href="#__codelineno-0-102">102</a></span>
+<span class="normal"><a href="#__codelineno-0-103">103</a></span>
+<span class="normal"><a href="#__codelineno-0-104">104</a></span>
+<span class="normal"><a href="#__codelineno-0-105">105</a></span>
+<span class="normal"><a href="#__codelineno-0-106">106</a></span>
+<span class="normal"><a href="#__codelineno-0-107">107</a></span>
+<span class="normal"><a href="#__codelineno-0-108">108</a></span>
+<span class="normal"><a href="#__codelineno-0-109">109</a></span>
+<span class="normal"><a href="#__codelineno-0-110">110</a></span>
+<span class="normal"><a href="#__codelineno-0-111">111</a></span>
+<span class="normal"><a href="#__codelineno-0-112">112</a></span>
+<span class="normal"><a href="#__codelineno-0-113">113</a></span>
+<span class="normal"><a href="#__codelineno-0-114">114</a></span>
+<span class="normal"><a href="#__codelineno-0-115">115</a></span>
+<span class="normal"><a href="#__codelineno-0-116">116</a></span>
+<span class="normal"><a href="#__codelineno-0-117">117</a></span>
+<span class="normal"><a href="#__codelineno-0-118">118</a></span>
+<span class="normal"><a href="#__codelineno-0-119">119</a></span>
+<span class="normal"><a href="#__codelineno-0-120">120</a></span>
+<span class="normal"><a href="#__codelineno-0-121">121</a></span>
+<span class="normal"><a href="#__codelineno-0-122">122</a></span>
+<span class="normal"><a href="#__codelineno-0-123">123</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Process the input JSON (string or object).</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Returns a minified JSON string.</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        text: JSON string, dict, or list to clean</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">        Minified JSON string with nulls/empties removed</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    Note:</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        If input is not valid JSON, returns input unchanged.</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="c1"># 1. Parse Input (Handle both string JSON and raw Dict/List)</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">text</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a>        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a>            <span class="c1"># If it&#39;s not valid JSON, return as-is to allow pipeline to continue safely</span>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a>            <span class="k">return</span> <span class="n">text</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="c1"># 2. Clean Structure</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a>    <span class="n">cleaned_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="c1"># 3. Dump Minified String (No whitespace)</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a>    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">cleaned_data</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="examples_3">Examples</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonCleaner</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Strip nulls and empty containers</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">cleaner</span> <span class="o">=</span> <span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">dirty_json</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="s2">{</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="s2">    &quot;name&quot;: &quot;Alice&quot;,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="s2">    &quot;age&quot;: null,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="s2">    &quot;address&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="s2">    &quot;tags&quot;: [],</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="s2">    &quot;bio&quot;: &quot;&quot;</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="s2">}</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="s2">&quot;&quot;&quot;</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="n">result</span> <span class="o">=</span> <span class="n">cleaner</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">dirty_json</span><span class="p">)</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="c1"># Output: {&quot;name&quot;:&quot;Alice&quot;}</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="c1"># Only strip nulls, keep empties</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="n">cleaner</span> <span class="o">=</span> <span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="n">result</span> <span class="o">=</span> <span class="n">cleaner</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">dirty_json</span><span class="p">)</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="c1"># Output: {&quot;name&quot;:&quot;Alice&quot;,&quot;address&quot;:{},&quot;tags&quot;:[],&quot;bio&quot;:&quot;&quot;}</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="c1"># Only minify (no cleaning)</span>
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="n">cleaner</span> <span class="o">=</span> <span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="n">result</span> <span class="o">=</span> <span class="n">cleaner</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">dirty_json</span><span class="p">)</span>
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="c1"># Output: {&quot;name&quot;:&quot;Alice&quot;,&quot;age&quot;:null,&quot;address&quot;:{},&quot;tags&quot;:[],&quot;bio&quot;:&quot;&quot;}</span>
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="c1"># Works with dict/list inputs too</span>
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a><span class="n">cleaner</span> <span class="o">=</span> <span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+<a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a><span class="n">result</span> <span class="o">=</span> <span class="n">cleaner</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a><span class="c1"># Output: {&quot;name&quot;:&quot;Bob&quot;}</span>
+</code></pre></div>
 <h2 id="common-use-cases">Common Use Cases</h2>
 <h3 id="web-scraping">Web Scraping</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Refiner</span><span class="p">,</span> <span class="n">StripHTML</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span><span class="p">,</span> <span class="n">FixUnicode</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">web_cleaner</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">Refiner</span><span class="p">()</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">StripHTML</span><span class="p">(</span><span class="n">to_markdown</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixUnicode</span><span class="p">())</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">NormalizeWhitespace</span><span class="p">())</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Refiner</span><span class="p">,</span> <span class="n">StripHTML</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span><span class="p">,</span> <span class="n">FixUnicode</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">web_cleaner</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">Refiner</span><span class="p">()</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">StripHTML</span><span class="p">(</span><span class="n">to_markdown</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixUnicode</span><span class="p">())</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">NormalizeWhitespace</span><span class="p">())</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="text-normalization">Text Normalization</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Refiner</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span><span class="p">,</span> <span class="n">FixUnicode</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">text_normalizer</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">Refiner</span><span class="p">()</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixUnicode</span><span class="p">())</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">NormalizeWhitespace</span><span class="p">())</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Refiner</span><span class="p">,</span> <span class="n">NormalizeWhitespace</span><span class="p">,</span> <span class="n">FixUnicode</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">text_normalizer</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">Refiner</span><span class="p">()</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixUnicode</span><span class="p">())</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">NormalizeWhitespace</span><span class="p">())</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span>
+</code></pre></div>
+<h3 id="rag-json-compression">RAG JSON Compression</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Refiner</span><span class="p">,</span> <span class="n">JsonCleaner</span><span class="p">,</span> <span class="n">TruncateTokens</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">rag_compressor</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">Refiner</span><span class="p">()</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">JsonCleaner</span><span class="p">(</span><span class="n">strip_nulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">TruncateTokens</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">))</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span>
 </code></pre></div>
 
 
