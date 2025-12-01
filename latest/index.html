@@ -506,17 +506,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1578,17 +1567,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1748,25 +1726,19 @@
 
 
 <h1 id="prompt-refiner">Prompt Refiner</h1>
-<p>A lightweight Python library for optimizing and cleaning LLM inputs. Reduce token usage, improve prompt quality, and lower API costs.</p>
+<p>A lightweight Python library for building production LLM applications. Save 10-20% on API costs and manage context windows intelligently.</p>
 <h2 id="overview">Overview</h2>
-<p>Prompt Refiner helps you clean and optimize prompts before sending them to LLM APIs. By removing unnecessary whitespace, duplicate characters, and other inefficiencies, you can:</p>
-<ul>
-<li><strong>Reduce token usage and API costs</strong> - Remove unnecessary characters and content</li>
-<li><strong>Improve prompt quality</strong> - Clean HTML, fix Unicode issues, normalize whitespace</li>
-<li><strong>Enhance security</strong> - Redact PII automatically before sending to APIs</li>
-<li><strong>Track optimization value</strong> - Measure token savings and cost reductions</li>
-</ul>
+<p>Prompt Refiner solves two core problems for production LLM applications:</p>
+<ol>
+<li><strong>Token Optimization</strong> - Clean dirty inputs (HTML, whitespace, PII) to reduce API costs by 10-20%</li>
+<li><strong>Context Management</strong> - Pack system prompts, RAG docs, and chat history into token budgets with smart priority-based selection</li>
+</ol>
+<p>Perfect for RAG applications, chatbots, and any production system that needs to manage LLM context windows efficiently.</p>
 <div class="admonition success">
 <p class="admonition-title">Proven Effectiveness</p>
 <p>Benchmarked on 30 real-world test cases, Prompt Refiner achieves <strong>4-15% token reduction</strong> while maintaining 96-99% quality. Aggressive optimization can save up to <strong>~$54/month</strong> on GPT-4 at scale (1M tokens/month).</p>
 <p>Processing overhead is <strong>&lt; 0.5ms per 1k tokens</strong> - negligible compared to network and LLM latency.</p>
 <p><a href="benchmark/">See benchmark results →</a></p>
-</div>
-<h2 id="status">Status</h2>
-<div class="admonition info">
-<p class="admonition-title">Early Development</p>
-<p>This project is in early development. Features are being added iteratively.</p>
 </div>
 <h2 id="quick-start">Quick Start</h2>
 <p>Build custom cleaning pipelines with the pipe operator:</p>
@@ -1825,28 +1797,29 @@
 <h4 id="5-packer-intelligent-context-packing-v013">5. Packer - Intelligent Context Packing (v0.1.3+)</h4>
 <p>For RAG applications and chatbots, the Packer module manages context budgets with priority-based selection:</p>
 <ul>
-<li><strong>MessagesPacker()</strong> - For chat completion APIs (OpenAI, Anthropic)</li>
-<li><strong>TextPacker()</strong> - For text completion APIs (Llama Base, GPT-3)</li>
+<li><strong>MessagesPacker()</strong> - For chat completion APIs (OpenAI, Anthropic). Returns <code>List[Dict]</code></li>
+<li><strong>TextPacker()</strong> - For text completion APIs (Llama Base, GPT-3). Returns <code>str</code></li>
 </ul>
 <p><strong>Key Features:</strong>
-- Priority-based greedy packing algorithm
+- Smart priority-based selection (auto-prioritizes: system &gt; query &gt; context &gt; history)
 - JIT refinement with <code>refine_with</code> parameter
 - Automatic format overhead calculation
-- Perfect for RAG with conversation history</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagesPacker</span><span class="p">,</span> <span class="n">PRIORITY_SYSTEM</span><span class="p">,</span> <span class="n">PRIORITY_HIGH</span><span class="p">,</span> <span class="n">StripHTML</span>
+- Semantic roles for clear intent</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagesPacker</span><span class="p">,</span> <span class="n">ROLE_SYSTEM</span><span class="p">,</span> <span class="n">ROLE_CONTEXT</span><span class="p">,</span> <span class="n">ROLE_QUERY</span><span class="p">,</span> <span class="n">StripHTML</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;You are helpful.&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_SYSTEM</span><span class="p">)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;You are helpful.&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">ROLE_SYSTEM</span><span class="p">)</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># Clean RAG documents on-the-fly</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="s2">&quot;&lt;div&gt;RAG doc...&lt;/div&gt;&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">priority</span><span class="o">=</span><span class="n">PRIORITY_HIGH</span><span class="p">,</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="n">StripHTML</span><span class="p">()</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">messages</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># Returns List[Dict] ready for chat APIs</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">role</span><span class="o">=</span><span class="n">ROLE_CONTEXT</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="n">StripHTML</span><span class="p">()</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="p">)</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;User question?&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">ROLE_QUERY</span><span class="p">)</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">messages</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># Returns List[Dict] ready for chat APIs</span>
 </code></pre></div>
 <p><a class="md-button" href="modules/packer/">Learn more about Packer →</a></p>
 <h2 id="complete-example">Complete Example</h2>
