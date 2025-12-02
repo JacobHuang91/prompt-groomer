@@ -70,6 +70,7 @@ class TextPacker(BasePacker):
         model: Optional[str] = None,
         text_format: TextFormat = TextFormat.RAW,
         separator: Optional[str] = None,
+        track_savings: bool = False,
     ):
         """
         Initialize text packer.
@@ -79,8 +80,10 @@ class TextPacker(BasePacker):
             model: Optional model name for precise token counting
             text_format: Text formatting strategy (RAW, MARKDOWN, XML)
             separator: String to join items (default: "\\n\\n" for clarity)
+            track_savings: Enable automatic token savings tracking for refine_with
+                operations (default: False)
         """
-        super().__init__(max_tokens, model)
+        super().__init__(max_tokens, model, track_savings)
         self.text_format = text_format
         self.separator = separator if separator is not None else "\n\n"
 

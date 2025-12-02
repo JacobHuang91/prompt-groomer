@@ -12,7 +12,9 @@ Usage:
 - Precise mode: CountTokens(model="gpt-4")
 """
 
-from prompt_refiner import ContextPacker, CountTokens, PRIORITY_HIGH, PRIORITY_SYSTEM
+
+from prompt_refiner import MessagesPacker, CountTokens
+
 
 print("=" * 70)
 print("Token Counting Modes")
@@ -47,31 +49,29 @@ print(f"\nText: '{text}'")
 print(f"Token count: {stats_precise['tokens']}")
 print(f"Mode: {'Precise (tiktoken)' if counter_precise.is_precise else 'Estimation (chars/4)'}")
 
-# Example 3: ContextPacker - Default estimation mode
-print("\n\n3. ContextPacker - Default Estimation Mode")
+# Example 3: MessagesPacker - Default estimation mode
+print("\n\n3. MessagesPacker - Default Estimation Mode")
 print("-" * 70)
-print("Creating ContextPacker with max_tokens=100 (no model specified)...")
+print("Creating MessagesPacker (no model specified)...")
 print()
 
-packer_default = ContextPacker(max_tokens=100)
+packer_default = MessagesPacker()
 
 print(f"\nPacker settings:")
-print(f"  Raw max tokens: {packer_default.raw_max_tokens}")
-print(f"  Effective max tokens: {packer_default.effective_max_tokens}")
-print(f"  Safety buffer: {packer_default.raw_max_tokens - packer_default.effective_max_tokens} tokens")
+print(f"  Precise mode: {packer_default._token_counter.is_precise}")
+print(f"  Unlimited mode: {packer_default.effective_max_tokens is None}")
 
-# Example 4: ContextPacker - Opt-in to precise mode
-print("\n\n4. ContextPacker - Opt-in to Precise Mode")
+# Example 4: MessagesPacker - Opt-in to precise mode
+print("\n\n4. MessagesPacker - Opt-in to Precise Mode")
 print("-" * 70)
-print("Creating ContextPacker with max_tokens=100, model='gpt-4'...")
+print("Creating MessagesPacker with model='gpt-4'...")
 print()
 
-packer_precise = ContextPacker(max_tokens=100, model="gpt-4")
+packer_precise = MessagesPacker(model="gpt-4")
 
 print(f"\nPacker settings:")
-print(f"  Raw max tokens: {packer_precise.raw_max_tokens}")
-print(f"  Effective max tokens: {packer_precise.effective_max_tokens}")
-print(f"  Safety buffer: {packer_precise.raw_max_tokens - packer_precise.effective_max_tokens} tokens")
+print(f"  Precise mode: {packer_precise._token_counter.is_precise}")
+print(f"  Unlimited mode: {packer_precise.effective_max_tokens is None}")
 
 # Example 5: Comparison between modes
 print("\n\n5. Estimation vs Precise Mode Comparison")
@@ -94,20 +94,21 @@ for text in texts:
     print(f"{text[:47]+'...' if len(text) > 50 else text:<50} {stats['tokens']:>10}")
 
 # Example 6: Why the safety buffer matters
-print("\n\n6. Why the 10% Safety Buffer Matters")
+print("\n\n6. Why the 10% Safety Buffer Matters (when using max_tokens)")
 print("-" * 70)
 print("""
-In estimation mode (without tiktoken), token counting uses the approximation:
-  1 token ≈ 4 characters
+When you specify max_tokens, the token counting behavior differs:
 
-However, this can be inaccurate for:
+In estimation mode (without tiktoken):
+  1 token ≈ 4 characters (approximation)
+
+This can be inaccurate for:
 - Non-English text (Chinese, Arabic, etc.)
 - Special characters and emojis
 - Code with lots of punctuation
 - Numbers and dates
 
-The 10% safety buffer (90% effective capacity) helps prevent context overflow
-by being conservative with the budget.
+The 10% safety buffer (90% effective capacity) helps prevent context overflow:
 
 Example:
   max_tokens=1000 (requested)
@@ -118,6 +119,8 @@ When you install tiktoken, the buffer is removed:
   max_tokens=1000 (requested)
   → effective_max_tokens=1000 (actual limit in precise mode)
   → 0 token buffer (no estimation error)
+
+Note: In most cases, using unlimited mode (no max_tokens) is recommended.
 """)
 
 # Example 7: How to enable precise mode
@@ -129,11 +132,11 @@ Step 1: Install tiktoken
 
 Step 2: Pass a model name to opt-in
     counter = CountTokens(model="gpt-4")
-    packer = ContextPacker(max_tokens=1000, model="gpt-4")
+    packer = MessagesPacker(model="gpt-4")
 
 Benefits of precise mode:
 ✓ Accurate token counts (no approximation)
-✓ Full token budget utilization (no 10% safety buffer)
+✓ Full token budget utilization (no 10% safety buffer when using max_tokens)
 ✓ Better handling of non-English text
 ✓ More predictable context management
 
@@ -143,6 +146,8 @@ When to use estimation mode (default):
 ✓ Development/testing environments
 ✓ When approximate counts are sufficient
 ✓ Simply don't pass a model parameter (or pass model=None)
+
+Note: In most cases, use unlimited mode (no max_tokens parameter) to include all content.
 """)
 
 print("=" * 70)

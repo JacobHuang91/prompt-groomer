@@ -60,18 +60,33 @@ class BasePacker(ABC):
     - pack(): Format and return packed items
     """
 
-    def __init__(self, max_tokens: Optional[int] = None, model: Optional[str] = None):
+    def __init__(
+        self,
+        max_tokens: Optional[int] = None,
+        model: Optional[str] = None,
+        track_savings: bool = False,
+    ):
         """
         Initialize packer with optional token budget.
 
         Args:
             max_tokens: Maximum token budget. If None, includes all items without limit.
             model: Optional model name for precise token counting (requires tiktoken)
+            track_savings: Enable automatic token savings tracking for refine_with
+                operations (default: False)
         """
         self.raw_max_tokens = max_tokens
         self._items: List[PackableItem] = []
         self._insertion_counter = 0
         self._token_counter = CountTokens(model=model)
+
+        # Token savings tracking (opt-in)
+        self.track_savings = track_savings
+        self._savings_stats = {
+            "original_tokens": 0,  # Sum of tokens before refinement
+            "refined_tokens": 0,  # Sum of tokens after refinement
+            "items_refined": 0,  # Count of items that used refine_with
+        }
 
         # Calculate effective max tokens
         if max_tokens is None:
@@ -133,13 +148,25 @@ class BasePacker(ABC):
             else:
                 priority = PRIORITY_MEDIUM  # 30 - Unknown roles
 
-        # JIT refinement
+        # JIT refinement with optional tracking
         if refine_with:
+            # Track original tokens before refinement (if tracking enabled)
+            original_content = content if self.track_savings else None
+
+            # Apply refinement operations
             if isinstance(refine_with, list):
                 for op in refine_with:
                     content = op.process(content)
             else:
                 content = refine_with.process(content)
+
+            # Update savings statistics (if tracking enabled)
+            if self.track_savings and original_content is not None:
+                original_tokens = self._count_tokens(original_content)
+                refined_tokens = self._count_tokens(content)
+                self._savings_stats["original_tokens"] += original_tokens
+                self._savings_stats["refined_tokens"] += refined_tokens
+                self._savings_stats["items_refined"] += 1
 
         # Count base tokens (without format overhead)
         tokens = self._count_tokens(content)
@@ -253,13 +280,22 @@ class BasePacker(ABC):
 
     def reset(self) -> "BasePacker":
         """
-        Reset the packer, removing all items.
+        Reset the packer, removing all items and clearing savings statistics.
 
         Returns:
             Self for method chaining
         """
         self._items.clear()
         self._insertion_counter = 0
+
+        # Reset savings tracking
+        if self.track_savings:
+            self._savings_stats = {
+                "original_tokens": 0,
+                "refined_tokens": 0,
+                "items_refined": 0,
+            }
+
         logger.debug("Packer reset")
         return self
 
@@ -279,6 +315,51 @@ class BasePacker(ABC):
             }
             for item in self._items
         ]
+
+    def get_token_savings(self) -> dict:
+        """
+        Get token savings statistics from refinement operations.
+
+        Only includes items that used refine_with parameter. Items added
+        without refinement are not counted.
+
+        Returns:
+            Dictionary with savings statistics:
+            - original_tokens: Total tokens before refinement
+            - refined_tokens: Total tokens after refinement
+            - saved_tokens: Tokens saved (original - refined)
+            - saving_percent: Percentage saved as formatted string (e.g., "12.5%")
+            - items_refined: Number of items that were refined
+
+            Returns empty dict if track_savings=False or no items refined.
+
+        Example:
+            >>> packer = MessagesPacker(max_tokens=1000, track_savings=True)
+            >>> packer.add(html_doc, role=ROLE_CONTEXT, refine_with=StripHTML())
+            >>> messages = packer.pack()
+            >>> stats = packer.get_token_savings()
+            >>> print(f"Saved {stats['saved_tokens']} tokens ({stats['saving_percent']})")
+        """
+        if not self.track_savings:
+            logger.debug("Token savings tracking is disabled. Enable with track_savings=True")
+            return {}
+
+        if self._savings_stats["items_refined"] == 0:
+            logger.debug("No items have been refined yet")
+            return {}
+
+        original = self._savings_stats["original_tokens"]
+        refined = self._savings_stats["refined_tokens"]
+        saved = original - refined
+        saving_percent = (saved / original * 100) if original > 0 else 0.0
+
+        return {
+            "original_tokens": original,
+            "refined_tokens": refined,
+            "saved_tokens": saved,
+            "saving_percent": f"{saving_percent:.1f}%",
+            "items_refined": self._savings_stats["items_refined"],
+        }
 
     @abstractmethod
     def pack(self):

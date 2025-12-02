@@ -20,6 +20,26 @@ Perfect for RAG applications, chatbots, and any production system that needs to 
 
 ## Quick Start
 
+### Option 1: Preset Strategies (Easiest)
+
+**New in v0.1.5**: Use benchmark-tested preset strategies for instant token optimization:
+
+```python
+from prompt_refiner.strategy import MinimalStrategy, AggressiveStrategy
+
+# Minimal: 4.3% reduction, 98.7% quality
+refiner = MinimalStrategy().create_refiner()
+cleaned = refiner.run("<div>Your HTML content</div>")
+
+# Aggressive: 15% reduction, 96.4% quality
+refiner = AggressiveStrategy(max_tokens=150).create_refiner()
+cleaned = refiner.run(long_context)
+```
+
+[Learn more about strategies →](api-reference/strategy.md){ .md-button }
+
+### Option 2: Custom Pipelines (Flexible)
+
 Build custom cleaning pipelines with the pipe operator:
 
 ```python

@@ -1,123 +1,110 @@
 """
-TextPacker Demo - Text Completion APIs (v0.1.3+)
+TextPacker Demo - Text Completion APIs
 
-Demonstrates TextPacker for text completion APIs like:
-- Base models (Llama-2-base, GPT-3, Mistral-base)
-- Completion endpoints (not chat)
-
-Key Features:
-- Returns str ready for completion APIs
-- Multiple text formats: RAW, MARKDOWN, XML
-- Priority-based greedy selection
-- JIT refinement with operations
-- Conversation history management
-- Automatic delimiter overhead accounting
+Shows how to use TextPacker for base models and completion endpoints.
+Demonstrates token optimization through HTML cleaning and MARKDOWN formatting.
 """
 
-import logging
+from dotenv import load_dotenv
+from openai import OpenAI
 
 from prompt_refiner import (
-    PRIORITY_HIGH,
-    PRIORITY_LOW,
-    PRIORITY_MEDIUM,
-    PRIORITY_QUERY,
-    PRIORITY_SYSTEM,
     ROLE_ASSISTANT,
     ROLE_CONTEXT,
     ROLE_QUERY,
     ROLE_SYSTEM,
     ROLE_USER,
+    NormalizeWhitespace,
     StripHTML,
     TextFormat,
     TextPacker,
 )
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(message)s')
-logger = logging.getLogger(__name__)
+# Load environment variables from .env file
+load_dotenv()
 
 
 def main():
-    """Complete RAG + conversation history example with TextPacker."""
-    logger.info("\n" + "=" * 80)
-    logger.info("TextPacker - RAG + Conversation History Example")
-    logger.info("=" * 80)
-
-    # Initialize packer for base model with MARKDOWN format
-    # max_tokens is optional - omit it to include all items without limit
-    packer = TextPacker(
-        max_tokens=300,  # Or omit for unlimited: TextPacker(text_format=TextFormat.MARKDOWN)
-        text_format=TextFormat.MARKDOWN,  # Use RAW, MARKDOWN, or XML
-        separator="\n\n",  # Smart default for clarity
-    )
-
-    # 1. System prompt (auto priority=0 for ROLE_SYSTEM)
-    packer.add(
-        "You are a QA assistant. Answer questions based on the provided context.",
-        role=ROLE_SYSTEM,  # Auto: PRIORITY_SYSTEM (0)
-    )
-
-    # 2. RAG documents with JIT HTML cleaning (auto priority=20 for ROLE_CONTEXT)
+    # RAG documents with messy HTML and excessive whitespace (common in web scraping)
     doc_html = """
     <div class="doc">
-        <h2>TextPacker</h2>
-        <p>TextPacker is optimized for text completion APIs. It supports multiple
-        formatting strategies to prevent instruction drifting in base models.</p>
+        <h2>TextPacker   Overview</h2>
+        <p>TextPacker   is   optimized   for   text   completion   APIs.
+        It   supports   multiple   formatting   strategies   to   prevent
+        instruction   drifting   in   base   models.</p>
+
+        <script>analytics.track();</script>
+        <style>.sidebar { display: none; }</style>
+        <nav><ul><li>Home</li></ul></nav>
     </div>
     """
-    packer.add(
-        doc_html,
-        role=ROLE_CONTEXT,  # RAG document, auto: PRIORITY_HIGH (20)
-        refine_with=StripHTML(),  # Clean HTML before packing
+
+    # Initialize packer with MARKDOWN format and automatic token savings tracking
+    packer = TextPacker(
+        text_format=TextFormat.MARKDOWN,
+        separator="\n\n",
+        model="gpt-3.5-turbo-instruct",
+        track_savings=True,
     )
 
+    # Add system instructions
+    packer.add(
+        "You are a QA assistant. Answer questions based on the provided context.",
+        role=ROLE_SYSTEM,
+    )
+
+    # Add RAG documents with automatic cleaning pipeline
+    packer.add(doc_html, role=ROLE_CONTEXT, refine_with=[StripHTML(), NormalizeWhitespace()])
     packer.add(
         "The library includes 5 modules: Cleaner, Compressor, Scrubber, Analyzer, and Packer.",
-        role=ROLE_CONTEXT,  # RAG document, auto: PRIORITY_HIGH (20)
+        role=ROLE_CONTEXT,
     )
 
-    # 3. Conversation history (auto priority=40 for history)
-    conversation_history = [
+    # Add conversation history
+    history = [
         {"role": ROLE_USER, "content": "What is prompt-refiner?"},
         {"role": ROLE_ASSISTANT, "content": "It's a Python library for optimizing LLM inputs."},
         {"role": ROLE_USER, "content": "Does it reduce costs?"},
         {"role": ROLE_ASSISTANT, "content": "Yes, by removing unnecessary tokens it can save 10-20% on API costs."},
     ]
-    packer.add_messages(conversation_history)  # Auto: PRIORITY_LOW (40) for history
+    packer.add_messages(history)
 
-    # 4. Recent context (ROLE_USER from history = auto priority=40)
-    packer.add(
-        "I'm working with Llama-2-base and need efficient context management.",
-        role=ROLE_USER,  # Conversation history, auto: PRIORITY_LOW (40)
-    )
+    # Add current query
+    packer.add("What is TextPacker and how does it work?", role=ROLE_QUERY)
 
-    # 5. Current query (ROLE_QUERY = auto priority=10)
-    packer.add(
-        "What is TextPacker and how does it work?",
-        role=ROLE_QUERY,  # Current user query, auto: PRIORITY_QUERY (10)
-    )
-
-    # Pack into text format
+    # Pack into text format with priority-based selection
     prompt = packer.pack()
 
-    # Display results
-    logger.info(f"\nToken Budget: {packer.raw_max_tokens} tokens")
-    logger.info(f"Effective Budget: {packer.effective_max_tokens} tokens")
+    # Get automatic token savings
+    savings = packer.get_token_savings()
 
-    logger.info("\n" + "-" * 80)
-    logger.info("PACKED OUTPUT (Ready for Completion API):")
-    logger.info("-" * 80)
-    logger.info(prompt)
+    if savings:
+        print("Token Optimization (automatic tracking):")
+        print(f"  Before: {savings['original_tokens']} tokens")
+        print(f"  After:  {savings['refined_tokens']} tokens")
+        print(f"  Saved:  {savings['saved_tokens']} tokens ({savings['saving_percent']})")
+        print()
 
-    logger.info("\n" + "=" * 80)
-    logger.info("KEY FEATURES DEMONSTRATED:")
-    logger.info("  ✓ MARKDOWN format with clear section boundaries")
-    logger.info("  ✓ Priority-based selection (SYSTEM > USER > HIGH > MEDIUM > LOW)")
-    logger.info("  ✓ RAG document integration with JIT HTML cleaning")
-    logger.info("  ✓ Conversation history management")
-    logger.info("  ✓ Direct str output - ready for completion APIs")
-    logger.info("  ✓ Automatic delimiter overhead accounting")
-    logger.info("=" * 80)
+    print(f"Context Management:")
+    print(f"  Packed {len(packer.get_items())} items")
+    print()
+
+    print("Formatted Prompt:")
+    print("-" * 80)
+    print(prompt)
+    print("-" * 80 + "\n")
+
+    # Call OpenAI Completions API
+    client = OpenAI()
+    response = client.completions.create(
+        model="gpt-3.5-turbo-instruct",
+        prompt=prompt,
+        max_tokens=256,
+        temperature=0.7,
+    )
+
+    print("Response:")
+    print(response.choices[0].text)
 
 
 if __name__ == "__main__":

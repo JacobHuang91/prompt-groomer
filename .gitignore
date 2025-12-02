@@ -53,3 +53,4 @@ uv.lock
 # Claude Code
 .claude/
 /site/
+examples/packer/.env

@@ -1,6 +1,6 @@
 """Prompt Refiner - A lightweight library for optimizing LLM inputs."""
 
-__version__ = "0.1.3"
+__version__ = "0.1.5"
 
 from .analyzer import CountTokens
 
@@ -28,6 +28,7 @@ from .packer import (
 )
 from .refiner import Refiner
 from .scrubber import RedactPII
+from .strategy import AggressiveStrategy, MinimalStrategy, StandardStrategy
 
 __all__ = [
     "Refiner",
@@ -64,4 +65,8 @@ __all__ = [
     # Overhead constants
     "PER_MESSAGE_OVERHEAD",
     "PER_REQUEST_OVERHEAD",
+    # Preset strategies
+    "MinimalStrategy",
+    "StandardStrategy",
+    "AggressiveStrategy",
 ]
