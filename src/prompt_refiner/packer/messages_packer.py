@@ -40,15 +40,22 @@ class MessagesPacker(BasePacker):
         >>> messages = packer.pack()
     """
 
-    def __init__(self, max_tokens: Optional[int] = None, model: Optional[str] = None):
+    def __init__(
+        self,
+        max_tokens: Optional[int] = None,
+        model: Optional[str] = None,
+        track_savings: bool = False,
+    ):
         """
         Initialize messages packer.
 
         Args:
             max_tokens: Maximum token budget. If None, includes all items without limit.
             model: Optional model name for precise token counting
+            track_savings: Enable automatic token savings tracking for refine_with
+                operations (default: False)
         """
-        super().__init__(max_tokens, model)
+        super().__init__(max_tokens, model, track_savings)
 
         # Pre-deduct request-level overhead (priming tokens) if budget is limited
         if self.effective_max_tokens is not None:

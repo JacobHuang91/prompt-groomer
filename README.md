@@ -138,6 +138,48 @@ pip install llm-prompt-refiner[token]
 - **Default (Lightweight)**: Zero dependencies, uses character-based token estimation
 - **Precise Mode**: Installs `tiktoken` for accurate token counting with no safety buffer. Pass a `model` parameter to CountTokens or MessagesPacker/TextPacker to enable.
 
+## 🚀 Quick Start with Preset Strategies
+
+**Don't want to manually configure operations?** Use our benchmark-tested preset strategies:
+
+```python
+from prompt_refiner.strategy import MinimalStrategy, AggressiveStrategy
+
+# Minimal: 4.3% reduction, 98.7% quality
+refiner = MinimalStrategy().create_refiner()
+cleaned = refiner.run("<div>Your HTML content</div>")
+
+# Aggressive: 15% reduction, 96.4% quality
+refiner = AggressiveStrategy(max_tokens=150).create_refiner()
+cleaned = refiner.run(long_context)
+```
+
+**Choose your strategy:**
+
+| Strategy | Token Reduction | Quality | Use Case |
+|----------|----------------|---------|----------|
+| **Minimal** | 4.3% | 98.7% | Maximum quality, minimal risk |
+| **Standard** | 4.8% | 98.4% | RAG contexts with duplicates |
+| **Aggressive** | 15% | 96.4% | Cost optimization, long contexts |
+
+**Usage patterns:**
+
+```python
+# Basic usage
+from prompt_refiner.strategy import MinimalStrategy
+refiner = MinimalStrategy().create_refiner()
+
+# With custom parameters
+from prompt_refiner.strategy import AggressiveStrategy
+refiner = AggressiveStrategy(max_tokens=200).create_refiner()
+
+# Extend with additional operations
+refiner = MinimalStrategy().create_refiner()
+refiner.pipe(RedactPII(redact_types={"email"}))
+```
+
+> 📖 **See full examples:** [examples/strategy/](examples/strategy/)
+
 ## 📊 Proven Effectiveness
 
 We benchmarked Prompt Refiner on 30 real-world test cases (SQuAD + RAG scenarios) to measure token reduction and response quality:
@@ -253,7 +295,7 @@ Prompt Refiner is organized into 4 specialized transformation modules:
 
 Track and measure your optimization impact:
 
-- **`CountTokens()`** - Calculate token savings and ROI
+- **`CountTokens()`** - Calculate token savings and ROI for refiner pipelines
   - **Estimation mode** (default): Character-based approximation (1 token ≈ 4 chars)
   - **Precise mode** (with tiktoken): Exact token counts using OpenAI's tokenizer
 
@@ -317,11 +359,14 @@ messages = packer.pack()  # Returns List[Dict]
 
 Check out the [`examples/`](examples/) folder for detailed examples:
 
+**Quick Start:**
+- `strategy/` - Preset strategies (Minimal, Standard, Aggressive) for easy token optimization
+
 **Core Modules:**
 - `cleaner/` - HTML cleaning, JSON compression, whitespace normalization, Unicode fixing
 - `compressor/` - Smart truncation, deduplication
 - `scrubber/` - PII redaction
-- `packer/` - Context budget management with priorities for RAG
+- `packer/` - Context budget management with priorities + real API integration (OpenAI)
 
 **Measurement:**
 - `analyzer/` - Token counting and cost savings analysis

@@ -398,3 +398,131 @@ def test_text_packer_unknown_role():
 
     text = packer.pack()
     assert "Custom content" in text
+
+
+def test_token_savings_tracking_enabled():
+    """Test that token savings are tracked when enabled."""
+    packer = TextPacker(max_tokens=500, track_savings=True)
+
+    # Add item with refinement
+    dirty_html = "<div><p>This is a test</p></div>"
+    packer.add(dirty_html, role=ROLE_CONTEXT, refine_with=StripHTML())
+
+    # Get savings
+    savings = packer.get_token_savings()
+
+    # Should have savings data
+    assert savings != {}
+    assert "original_tokens" in savings
+    assert "refined_tokens" in savings
+    assert "saved_tokens" in savings
+    assert "saving_percent" in savings
+    assert "items_refined" in savings
+
+    # Should have positive savings
+    assert savings["original_tokens"] > savings["refined_tokens"]
+    assert savings["saved_tokens"] > 0
+    assert savings["items_refined"] == 1
+
+
+def test_token_savings_tracking_disabled():
+    """Test that token savings are not tracked when disabled by default."""
+    packer = TextPacker(max_tokens=500)  # track_savings defaults to False
+
+    # Add item with refinement
+    dirty_html = "<div><p>This is a test</p></div>"
+    packer.add(dirty_html, role=ROLE_CONTEXT, refine_with=StripHTML())
+
+    # Get savings
+    savings = packer.get_token_savings()
+
+    # Should return empty dict
+    assert savings == {}
+
+
+def test_token_savings_no_refinement():
+    """Test that empty dict is returned when no items are refined."""
+    packer = TextPacker(max_tokens=500, track_savings=True)
+
+    # Add items WITHOUT refinement
+    packer.add("Clean content", role=ROLE_SYSTEM)
+    packer.add("Another clean content", role=ROLE_CONTEXT)
+
+    # Get savings
+    savings = packer.get_token_savings()
+
+    # Should return empty dict (no items refined)
+    assert savings == {}
+
+
+def test_token_savings_multiple_items():
+    """Test that savings are aggregated across multiple refined items."""
+    packer = TextPacker(max_tokens=1000, track_savings=True)
+
+    # Add multiple items with refinement
+    dirty_html1 = "<div><p>First document</p></div>"
+    dirty_html2 = "<div><p>Second document with more content</p></div>"
+    messy_whitespace = "Text   with   excessive   whitespace"
+
+    packer.add(dirty_html1, role=ROLE_CONTEXT, refine_with=StripHTML())
+    packer.add(dirty_html2, role=ROLE_CONTEXT, refine_with=StripHTML())
+    packer.add(messy_whitespace, role=ROLE_CONTEXT, refine_with=NormalizeWhitespace())
+
+    # Add one item without refinement (should not be counted)
+    packer.add("Clean content", role=ROLE_SYSTEM)
+
+    # Get savings
+    savings = packer.get_token_savings()
+
+    # Should aggregate savings from all 3 refined items
+    assert savings["items_refined"] == 3
+    assert savings["original_tokens"] > savings["refined_tokens"]
+    assert savings["saved_tokens"] > 0
+
+
+def test_token_savings_reset():
+    """Test that reset clears savings statistics."""
+    packer = TextPacker(max_tokens=500, track_savings=True)
+
+    # Add item with refinement
+    dirty_html = "<div><p>This is a test</p></div>"
+    packer.add(dirty_html, role=ROLE_CONTEXT, refine_with=StripHTML())
+
+    # Verify savings exist
+    savings = packer.get_token_savings()
+    assert savings["items_refined"] == 1
+    assert savings["saved_tokens"] > 0
+
+    # Reset packer
+    packer.reset()
+
+    # Savings should be cleared
+    savings_after_reset = packer.get_token_savings()
+    assert savings_after_reset == {}
+
+    # Add new item with refinement
+    packer.add("<p>New content</p>", role=ROLE_CONTEXT, refine_with=StripHTML())
+
+    # Should track new savings
+    new_savings = packer.get_token_savings()
+    assert new_savings["items_refined"] == 1
+
+
+def test_token_savings_with_model():
+    """Test that token savings work with precise token counting."""
+    # Note: This test works whether or not tiktoken is installed
+    packer = TextPacker(max_tokens=500, model="gpt-4", track_savings=True)
+
+    # Add item with refinement
+    dirty_html = "<div><p>This is a test with precise counting</p></div>"
+    packer.add(dirty_html, role=ROLE_CONTEXT, refine_with=StripHTML())
+
+    # Get savings
+    savings = packer.get_token_savings()
+
+    # Should have savings data
+    assert savings != {}
+    assert savings["items_refined"] == 1
+    assert savings["original_tokens"] > savings["refined_tokens"]
+    assert savings["saved_tokens"] > 0
+    assert "%" in savings["saving_percent"]

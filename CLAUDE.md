@@ -45,7 +45,35 @@ Each core module contains specialized operations that can be composed into pipel
 
 ## Version History
 
-### v0.1.4 (Current) - Semantic Roles & Documentation Polish
+### v0.1.5 (Current) - Preset Strategies & Token Savings Tracking
+**Three Major Features:**
+
+1. **Strategy Module (NEW)**
+   - 3 benchmark-tested preset strategies: MinimalStrategy, StandardStrategy, AggressiveStrategy
+   - Direct instantiation API: `MinimalStrategy().create_refiner()`
+   - Type-safe with Literal types
+   - Fully extensible with `.pipe()` for additional operations
+   - 25 comprehensive tests + 3 focused example files
+
+2. **Token Savings Tracking (NEW)**
+   - Automatic token savings tracking in MessagesPacker and TextPacker
+   - Opt-in via `track_savings=True` parameter
+   - New `get_token_savings()` method returns aggregated statistics
+   - Measures impact of `refine_with` operations during packing
+   - 256 new tests for savings tracking functionality
+
+3. **Packer Examples Enhancement**
+   - Real OpenAI API integration in examples
+   - `.env` support with `python-dotenv` for API keys
+   - `examples/packer/README.md` with setup instructions
+   - Demonstrates production usage patterns with token savings
+
+**Documentation Updates:**
+- README updated with strategy quick start and token savings tracking
+- Updated examples from ContextPacker to MessagesPacker
+- Enhanced measurement documentation
+
+### v0.1.4 - Semantic Roles & Documentation Polish
 **Enhancements:**
 - **Semantic Roles**: Renamed `PRIORITY_USER` to `PRIORITY_QUERY` for clarity
 - **Smart Defaults**: All examples now use semantic roles (ROLE_SYSTEM, ROLE_QUERY, ROLE_CONTEXT) with auto-inferred priorities

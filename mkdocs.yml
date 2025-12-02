@@ -78,6 +78,7 @@ nav:
       - Compressor: modules/compressor.md
       - Scrubber: modules/scrubber.md
       - Analyzer: modules/analyzer.md
+      - Packer: modules/packer.md
   - API Reference:
       - Overview: api-reference/index.md
       - Refiner: api-reference/refiner.md
@@ -85,11 +86,15 @@ nav:
       - Compressor: api-reference/compressor.md
       - Scrubber: api-reference/scrubber.md
       - Analyzer: api-reference/analyzer.md
+      - Packer: api-reference/packer.md
+      - Strategy: api-reference/strategy.md
   - Examples:
       - Overview: examples/index.md
       - HTML Cleaning: examples/html-cleaning.md
       - Deduplication: examples/deduplication.md
       - PII Redaction: examples/pii-redaction.md
       - Token Analysis: examples/token-analysis.md
+      - Packer: examples/packer.md
+      - JSON Cleaning: examples/json-cleaning.md
       - Complete Pipeline: examples/complete-pipeline.md
   - Contributing: contributing.md

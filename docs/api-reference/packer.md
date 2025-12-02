@@ -117,6 +117,93 @@ TextFormat.XML       # Use <role>content</role> tags
 
     **Recommendation**: Use precise mode in production when you need maximum token utilization.
 
+## Token Savings Tracking
+
+**Version 0.1.5+** introduces automatic token savings tracking to measure the optimization impact of `refine_with` operations.
+
+### Enable Tracking
+
+```python
+# Opt-in to tracking with track_savings parameter
+packer = MessagesPacker(track_savings=True)
+
+# Add items with refinement
+packer.add(
+    "<div>  Messy   HTML  </div>",
+    role=ROLE_CONTEXT,
+    refine_with=[StripHTML(), NormalizeWhitespace()]
+)
+
+# Get savings statistics
+savings = packer.get_token_savings()
+# Returns: {
+#   'original_tokens': 25,      # Tokens before refinement
+#   'refined_tokens': 12,       # Tokens after refinement
+#   'saved_tokens': 13,         # Tokens saved
+#   'saving_percent': 52.0,     # Percentage saved
+#   'items_refined': 1          # Count of refined items
+# }
+```
+
+### Key Features
+
+- **Opt-in**: Disabled by default (no overhead when not needed)
+- **Automatic aggregation**: Tracks all items that use `refine_with`
+- **Per-item and total**: Aggregates savings across all refined items
+- **Works with both packers**: Available for `MessagesPacker` and `TextPacker`
+
+### Example with Real API
+
+```python
+from prompt_refiner import MessagesPacker, StripHTML, ROLE_CONTEXT
+from openai import OpenAI
+
+client = OpenAI()
+packer = MessagesPacker(model="gpt-4o", track_savings=True)
+
+# Add multiple RAG documents with automatic cleaning
+for doc in scraped_html_docs:
+    packer.add(doc, role=ROLE_CONTEXT, refine_with=StripHTML())
+
+# Pack messages and check savings
+messages = packer.pack()
+savings = packer.get_token_savings()
+
+print(f"Saved {savings['saved_tokens']} tokens ({savings['saving_percent']:.1f}%)")
+# Example output: "Saved 1,234 tokens (23.5%)"
+
+# Use cleaned messages with API
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=messages
+)
+```
+
+### When to Use
+
+✅ **Use token savings tracking when:**
+- You want to measure ROI of optimization efforts
+- Demonstrating token savings to stakeholders
+- A/B testing different refinement strategies
+- Monitoring optimization impact in production
+
+❌ **Skip tracking when:**
+- Not using `refine_with` parameter (returns empty dict)
+- Performance is absolutely critical (negligible overhead, but why enable?)
+- You don't need savings metrics
+
+!!! tip "Combine with CountTokens"
+    For pipeline optimization (not packer), use `CountTokens` instead:
+    ```python
+    from prompt_refiner import CountTokens, StripHTML, NormalizeWhitespace
+
+    counter = CountTokens(original_text=dirty_html)
+    pipeline = StripHTML() | NormalizeWhitespace()
+    clean = pipeline.run(dirty_html)
+    counter.process(clean)
+    print(counter.format_stats())
+    ```
+
 ## MessagesPacker Examples
 
 ### Basic Usage
