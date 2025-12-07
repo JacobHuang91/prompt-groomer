@@ -2032,19 +2032,19 @@
 - JIT refinement with <code>refine_with</code> parameter
 - Automatic format overhead calculation
 - Semantic roles for clear intent</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagesPacker</span><span class="p">,</span> <span class="n">ROLE_SYSTEM</span><span class="p">,</span> <span class="n">ROLE_CONTEXT</span><span class="p">,</span> <span class="n">ROLE_QUERY</span><span class="p">,</span> <span class="n">StripHTML</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">prompt_refiner</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagesPacker</span><span class="p">,</span> <span class="n">StripHTML</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">packer</span> <span class="o">=</span> <span class="n">MessagesPacker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;You are helpful.&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">ROLE_SYSTEM</span><span class="p">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;You are helpful.&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># Clean RAG documents on-the-fly</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="s2">&quot;&lt;div&gt;RAG doc...&lt;/div&gt;&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">role</span><span class="o">=</span><span class="n">ROLE_CONTEXT</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;context&quot;</span><span class="p">,</span>
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">refine_with</span><span class="o">=</span><span class="n">StripHTML</span><span class="p">()</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">)</span>
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;User question?&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">ROLE_QUERY</span><span class="p">)</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">packer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;User question?&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;query&quot;</span><span class="p">)</span>
 <a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
 <a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="n">messages</span> <span class="o">=</span> <span class="n">packer</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  <span class="c1"># Returns List[Dict] ready for chat APIs</span>
 </code></pre></div>
