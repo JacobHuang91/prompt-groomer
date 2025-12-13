@@ -3074,14 +3074,12 @@ cleaned = extended.run(text)</p>
 
 </h3>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">AggressiveStrategy</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">truncate_max_tokens</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">truncate_strategy</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">strip_html</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">strip_html_to_markdown</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">deduplicate_method</span><span class="o">=</span><span class="s2">&quot;jaccard&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">deduplicate_similarity_threshold</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">deduplicate_granularity</span><span class="o">=</span><span class="s2">&quot;sentence&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">strip_html</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">strip_html_to_markdown</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">deduplicate_method</span><span class="o">=</span><span class="s2">&quot;jaccard&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">deduplicate_similarity_threshold</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">deduplicate_granularity</span><span class="o">=</span><span class="s2">&quot;sentence&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3090,18 +3088,18 @@ cleaned = extended.run(text)</p>
 
 
 
-        <p>Aggressive strategy: Maximum token reduction with truncation.</p>
+        <p>Aggressive strategy: Maximum token reduction through aggressive deduplication.</p>
 <p>This strategy is itself a Pipeline, so you can use it directly or extend it.</p>
 <p>Refiners:
 - StripHTML: Remove HTML tags (optional)
 - NormalizeWhitespace: Collapse excessive whitespace
-- Deduplicate: Remove similar content
-- TruncateTokens: Limit to max_tokens</p>
+- Deduplicate: Aggressively remove similar content (threshold: 0.7)</p>
 <p>Characteristics:
-- Token reduction: ~15% (up to 74% on long contexts)
-- Quality: 96.4% (cosine similarity)
-- Use case: Cost optimization, long contexts, lenient quality requirements
+- Token reduction: ~5-10% (higher with duplicate content)
+- Quality: 96-98% (cosine similarity)
+- Use case: Cost optimization with duplicate/redundant content
 - Latency: 0.25ms per 1k tokens</p>
+<p>Note: For token budget control, use Packer's max_tokens parameter instead.</p>
 
 
 <details class="example" open>
@@ -3114,11 +3112,9 @@ cleaned = extended.run(text)</p>
 cleaned = strategy.run(text)</p>
 <h4 id="prompt_refiner.strategy.AggressiveStrategy--customize-operator-parameters">Customize operator parameters</h4>
 <p>strategy = AggressiveStrategy(
-...     truncate_max_tokens=500,
-...     truncate_strategy="tail",
 ...     strip_html_to_markdown=True,
 ...     deduplicate_method="levenshtein",
-...     deduplicate_similarity_threshold=0.9,
+...     deduplicate_similarity_threshold=0.6,
 ...     deduplicate_granularity="paragraph"
 ... )
 cleaned = strategy.run(text)</p>
@@ -3143,38 +3139,6 @@ cleaned = extended.run(text)</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>truncate_max_tokens</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum tokens to keep (default: 150)</p>
-              </div>
-            </td>
-            <td>
-                  <code>150</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>truncate_strategy</code>
-            </td>
-            <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;head&#39;, &#39;tail&#39;, &#39;middle_out&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Truncation strategy (default: "head")</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;head&#39;</code>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>strip_html</code>
@@ -3232,7 +3196,8 @@ cleaned = extended.run(text)</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Similarity threshold (default: 0.7)</p>
+                <p>Similarity threshold for aggressive deduplication
+(default: 0.7)</p>
               </div>
             </td>
             <td>
@@ -3267,7 +3232,8 @@ cleaned = extended.run(text)</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>src/prompt_refiner/strategy/aggressive.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-49">49</a></span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span>
 <span class="normal"><a href="#__codelineno-0-50">50</a></span>
 <span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
@@ -3303,67 +3269,44 @@ cleaned = extended.run(text)</p>
 <span class="normal"><a href="#__codelineno-0-82">82</a></span>
 <span class="normal"><a href="#__codelineno-0-83">83</a></span>
 <span class="normal"><a href="#__codelineno-0-84">84</a></span>
-<span class="normal"><a href="#__codelineno-0-85">85</a></span>
-<span class="normal"><a href="#__codelineno-0-86">86</a></span>
-<span class="normal"><a href="#__codelineno-0-87">87</a></span>
-<span class="normal"><a href="#__codelineno-0-88">88</a></span>
-<span class="normal"><a href="#__codelineno-0-89">89</a></span>
-<span class="normal"><a href="#__codelineno-0-90">90</a></span>
-<span class="normal"><a href="#__codelineno-0-91">91</a></span>
-<span class="normal"><a href="#__codelineno-0-92">92</a></span>
-<span class="normal"><a href="#__codelineno-0-93">93</a></span>
-<span class="normal"><a href="#__codelineno-0-94">94</a></span>
-<span class="normal"><a href="#__codelineno-0-95">95</a></span>
-<span class="normal"><a href="#__codelineno-0-96">96</a></span>
-<span class="normal"><a href="#__codelineno-0-97">97</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="c1"># Parameters to configure TruncateTokens operator</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">truncate_max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">truncate_strategy</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="s2">&quot;tail&quot;</span><span class="p">,</span> <span class="s2">&quot;middle_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;head&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="c1"># Parameters to configure StripHTML operator</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="n">strip_html</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="n">strip_html_to_markdown</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="c1"># Parameters to configure Deduplicate operator</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a>    <span class="n">deduplicate_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;jaccard&quot;</span><span class="p">,</span> <span class="s2">&quot;levenshtein&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;jaccard&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="n">deduplicate_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a>    <span class="n">deduplicate_granularity</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sentence&quot;</span><span class="p">,</span> <span class="s2">&quot;paragraph&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;sentence&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="p">):</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Initialize aggressive strategy with configured operators.</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        truncate_max_tokens: Maximum tokens to keep (default: 150)</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        truncate_strategy: Truncation strategy (default: &quot;head&quot;)</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        strip_html: Whether to include StripHTML operator (default: True)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">        strip_html_to_markdown: Convert HTML to Markdown instead of stripping (default: False)</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        deduplicate_method: Deduplication method (default: &quot;jaccard&quot;)</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        deduplicate_similarity_threshold: Similarity threshold (default: 0.7)</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        deduplicate_granularity: Deduplication granularity (default: &quot;sentence&quot;)</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="n">operations</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="normal"><a href="#__codelineno-0-85">85</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="c1"># Parameters to configure StripHTML operator</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="n">strip_html</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">strip_html_to_markdown</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="c1"># Parameters to configure Deduplicate operator</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="n">deduplicate_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;jaccard&quot;</span><span class="p">,</span> <span class="s2">&quot;levenshtein&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;jaccard&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="n">deduplicate_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="n">deduplicate_granularity</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sentence&quot;</span><span class="p">,</span> <span class="s2">&quot;paragraph&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;sentence&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="p">):</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Initialize aggressive strategy with configured operators.</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        strip_html: Whether to include StripHTML operator (default: True)</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        strip_html_to_markdown: Convert HTML to Markdown instead of stripping (default: False)</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">        deduplicate_method: Deduplication method (default: &quot;jaccard&quot;)</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">        deduplicate_similarity_threshold: Similarity threshold for aggressive deduplication</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">            (default: 0.7)</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        deduplicate_granularity: Deduplication granularity (default: &quot;sentence&quot;)</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="n">operations</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="k">if</span> <span class="n">strip_html</span><span class="p">:</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>        <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">StripHTML</span><span class="p">(</span><span class="n">to_markdown</span><span class="o">=</span><span class="n">strip_html_to_markdown</span><span class="p">))</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NormalizeWhitespace</span><span class="p">())</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="k">if</span> <span class="n">strip_html</span><span class="p">:</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>        <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">StripHTML</span><span class="p">(</span><span class="n">to_markdown</span><span class="o">=</span><span class="n">strip_html_to_markdown</span><span class="p">))</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NormalizeWhitespace</span><span class="p">())</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="n">Deduplicate</span><span class="p">(</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>            <span class="n">method</span><span class="o">=</span><span class="n">deduplicate_method</span><span class="p">,</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a>            <span class="n">similarity_threshold</span><span class="o">=</span><span class="n">deduplicate_similarity_threshold</span><span class="p">,</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>            <span class="n">granularity</span><span class="o">=</span><span class="n">deduplicate_granularity</span><span class="p">,</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a>        <span class="p">)</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="p">)</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a>    <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>        <span class="n">TruncateTokens</span><span class="p">(</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>            <span class="n">max_tokens</span><span class="o">=</span><span class="n">truncate_max_tokens</span><span class="p">,</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>            <span class="n">strategy</span><span class="o">=</span><span class="n">truncate_strategy</span><span class="p">,</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>        <span class="p">)</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="p">)</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="c1"># Initialize Pipeline with the configured operators</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">operations</span><span class="p">)</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>        <span class="n">Deduplicate</span><span class="p">(</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>            <span class="n">method</span><span class="o">=</span><span class="n">deduplicate_method</span><span class="p">,</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>            <span class="n">similarity_threshold</span><span class="o">=</span><span class="n">deduplicate_similarity_threshold</span><span class="p">,</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>            <span class="n">granularity</span><span class="o">=</span><span class="n">deduplicate_granularity</span><span class="p">,</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>        <span class="p">)</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="p">)</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="c1"># Initialize Pipeline with the configured operators</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">operations</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
