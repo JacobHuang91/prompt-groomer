@@ -1,0 +1,99 @@
+name: E2E Tests (PyPI)
+
+# Test the published package from PyPI after publishing
+# This ensures the published version works correctly for users
+
+on:
+  # Run after the publish workflow completes
+  workflow_run:
+    workflows: ["Publish to PyPI"]
+    types:
+      - completed
+
+  # Allow manual testing via GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to test (leave empty for latest)'
+        required: false
+        type: string
+
+jobs:
+  test-pypi:
+    name: Test PyPI Package (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    # Only run if publish workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code (for test script only)
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Wait for PyPI propagation
+        run: |
+          echo "Waiting 60 seconds for PyPI to propagate new release..."
+          sleep 60
+
+      - name: Install from PyPI
+        run: |
+          # Install the package from PyPI (what users actually do)
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "Installing specific version: ${{ github.event.inputs.version }}"
+            pip install llm-prompt-refiner==${{ github.event.inputs.version }}
+          else
+            echo "Installing latest version from PyPI"
+            pip install llm-prompt-refiner
+          fi
+          echo "Installed version:"
+          python -c "import prompt_refiner; print(prompt_refiner.__version__)"
+
+      - name: Run E2E tests
+        run: |
+          python tests/e2e/test_basic_usage.py
+
+      - name: Test with optional dependencies
+        run: |
+          # Test [token] extra
+          pip install llm-prompt-refiner[token]
+          python tests/e2e/test_basic_usage.py
+
+  verify-pypi:
+    name: Verify PyPI Installation
+    runs-on: ubuntu-latest
+    # Only run if publish workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    needs: test-pypi  # Run after all platform tests pass
+
+    steps:
+      - name: Checkout code (for test script only)
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install from PyPI
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            pip install llm-prompt-refiner==${{ github.event.inputs.version }}
+          else
+            pip install --upgrade llm-prompt-refiner
+          fi
+
+      - name: Verify installation and version
+        run: |
+          python -c "import prompt_refiner; print(f'✓ Successfully installed v{prompt_refiner.__version__} from PyPI')"
+
+      - name: Run comprehensive E2E tests
+        run: |
+          python tests/e2e/test_basic_usage.py
+          echo "✓ All E2E tests passed for PyPI package"

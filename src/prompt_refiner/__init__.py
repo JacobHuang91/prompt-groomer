@@ -1,6 +1,6 @@
 """Prompt Refiner - A lightweight library for optimizing LLM inputs."""
 
-__version__ = "0.1.5"
+__version__ = "0.2.1"
 
 from .analyzer import CountTokens
 
@@ -8,8 +8,6 @@ from .analyzer import CountTokens
 from .cleaner import FixUnicode, JsonCleaner, NormalizeWhitespace, StripHTML
 from .compressor import Deduplicate, TruncateTokens
 from .packer import (
-    PER_MESSAGE_OVERHEAD,
-    PER_REQUEST_OVERHEAD,
     PRIORITY_HIGH,
     PRIORITY_LOW,
     PRIORITY_MEDIUM,

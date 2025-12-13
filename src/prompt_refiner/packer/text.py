@@ -18,6 +18,9 @@ if TYPE_CHECKING:
     from ..pipeline import Pipeline
     from ..refiner import Refiner
 
+# Import default strategies for auto-refinement
+from ..strategy import MinimalStrategy, StandardStrategy
+
 logger = logging.getLogger(__name__)
 
 
@@ -54,23 +57,25 @@ class TextPacker(BasePacker):
     - XML: Semantic <role>content</role> tags
 
     Example:
-        >>> from prompt_refiner import TextPacker, TextFormat, PRIORITY_SYSTEM, PRIORITY_HIGH
-        >>> # With token budget
-        >>> packer = TextPacker(max_tokens=1000, text_format=TextFormat.MARKDOWN)
-        >>> packer.add("You are helpful.", role="system", priority=PRIORITY_SYSTEM)
-        >>> packer.add("Context document", priority=PRIORITY_HIGH)
+        >>> from prompt_refiner import TextPacker, TextFormat
+        >>> # Basic usage with automatic refining
+        >>> packer = TextPacker(
+        ...     text_format=TextFormat.MARKDOWN,
+        ...     system="You are helpful.",
+        ...     context=["<div>Doc 1</div>", "<div>Doc 2</div>"],
+        ...     query="What's the weather?"
+        ... )
         >>> prompt = packer.pack()
         >>> # Use directly: completion.create(prompt=prompt)
         >>>
-        >>> # Without token budget (unlimited mode)
-        >>> packer = TextPacker()  # All items included
-        >>> packer.add("System prompt", role="system", priority=PRIORITY_SYSTEM)
+        >>> # Traditional API still supported
+        >>> packer = TextPacker()
+        >>> packer.add("System prompt", role="system")
         >>> prompt = packer.pack()
     """
 
     def __init__(
         self,
-        max_tokens: Optional[int] = None,
         model: Optional[str] = None,
         text_format: TextFormat = TextFormat.RAW,
         separator: Optional[str] = None,
@@ -88,13 +93,20 @@ class TextPacker(BasePacker):
         """
         Initialize text packer.
 
+        **Default Refining Strategies**:
+        When no explicit refiner is provided, automatic refining strategies are applied:
+        - system/query: MinimalStrategy (StripHTML + NormalizeWhitespace)
+        - context/history: StandardStrategy (StripHTML + NormalizeWhitespace + Deduplicate)
+
+        To override defaults, provide explicit refiner tuple: (content, refiner).
+        For raw content with no refinement, use .add() method with refine_with=None.
+
         Args:
-            max_tokens: Maximum token budget. If None, includes all items without limit.
             model: Optional model name for precise token counting
             text_format: Text formatting strategy (RAW, MARKDOWN, XML)
             separator: String to join items (default: "\\n\\n" for clarity)
-            track_savings: Enable automatic token savings tracking for refine_with
-                operations (default: False)
+            track_savings: Enable automatic token savings tracking to measure
+                optimization impact (default: False)
             system: System message. Can be:
                 - str: "You are helpful"
                 - Tuple[str, Refiner]: ("You are helpful", StripHTML())
@@ -146,39 +158,46 @@ class TextPacker(BasePacker):
             ... )
             >>> prompt = packer.pack()
         """
-        super().__init__(max_tokens, model, track_savings)
+        super().__init__(model, track_savings)
         self.text_format = text_format
         self.separator = separator if separator is not None else "\n\n"
 
-        # For MARKDOWN grouped format: Pre-deduct fixed header costs ("entrance fee")
-        # This prevents overestimating overhead for each item
-        if self.text_format == TextFormat.MARKDOWN and self.effective_max_tokens is not None:
-            self._reserve_fixed_headers()
-
         logger.debug(
             f"TextPacker initialized with format={text_format.value}, "
-            f"separator={repr(self.separator)}, "
-            f"unlimited={self.effective_max_tokens is None}"
+            f"separator={repr(self.separator)}"
         )
 
         # Auto-add items if provided (convenient API)
         # Extract content and refiner from tuple if provided
+        # Apply default strategies when no explicit refiner provided
         if system is not None:
             system_content, system_refiner = self._extract_field(system)
+            # Apply MinimalStrategy to system if no explicit refiner
+            if system_refiner is None:
+                system_refiner = MinimalStrategy()
             self.add(system_content, role="system", refine_with=system_refiner)
 
         if context is not None:
             context_docs, context_refiner = self._extract_field(context)
+            # Apply StandardStrategy to context if no explicit refiner
+            if context_refiner is None:
+                context_refiner = StandardStrategy()
             for doc in context_docs:
                 self.add(doc, role="context", refine_with=context_refiner)
 
         if history is not None:
             history_msgs, history_refiner = self._extract_field(history)
+            # Apply StandardStrategy to history if no explicit refiner
+            if history_refiner is None:
+                history_refiner = StandardStrategy()
             for msg in history_msgs:
                 self.add(msg["content"], role=msg["role"], refine_with=history_refiner)
 
         if query is not None:
             query_content, query_refiner = self._extract_field(query)
+            # Apply MinimalStrategy to query if no explicit refiner
+            if query_refiner is None:
+                query_refiner = MinimalStrategy()
             self.add(query_content, role="query", refine_with=query_refiner)
 
     @staticmethod
@@ -215,7 +234,6 @@ class TextPacker(BasePacker):
         ] = None,
         query: Optional[Union[str, Tuple[str, Union["Refiner", "Pipeline"]]]] = None,
         model: Optional[str] = None,
-        max_tokens: Optional[int] = None,
         text_format: TextFormat = TextFormat.RAW,
         separator: Optional[str] = None,
         track_savings: bool = False,
@@ -223,13 +241,16 @@ class TextPacker(BasePacker):
         """
         One-liner to create packer and pack text immediately.
 
+        Default refining strategies are automatically applied (same as __init__):
+        - system/query: MinimalStrategy
+        - context/history: StandardStrategy
+
         Args:
             system: System message (str or (str, Refiner/Pipeline) tuple)
             context: Context documents (list or (list, Refiner/Pipeline) tuple)
             history: Conversation history (list or (list, Refiner/Pipeline) tuple)
             query: Current query (str or (str, Refiner/Pipeline) tuple)
             model: Optional model name for precise token counting
-            max_tokens: Optional token budget
             text_format: Text formatting strategy (RAW, MARKDOWN, XML)
             separator: String to join items
             track_savings: Enable token savings tracking
@@ -268,7 +289,6 @@ class TextPacker(BasePacker):
             ... )
         """
         packer = cls(
-            max_tokens=max_tokens,
             model=model,
             text_format=text_format,
             separator=separator,
@@ -279,80 +299,6 @@ class TextPacker(BasePacker):
             query=query,
         )
         return packer.pack()
-
-    def _reserve_fixed_headers(self) -> None:
-        """
-        Pre-deduct fixed header costs for MARKDOWN grouped format.
-
-        Section headers (INSTRUCTIONS, CONTEXT, CONVERSATION, INPUT) are fixed costs
-        that don't scale with number of items. We reserve tokens upfront to prevent
-        overestimating per-item overhead.
-
-        Estimated costs:
-        - "### INSTRUCTIONS:\n" ≈ 4 tokens
-        - "### CONTEXT:\n" ≈ 3 tokens
-        - "### CONVERSATION:\n" ≈ 4 tokens
-        - "### INPUT:\n" ≈ 3 tokens
-        - Section separators "\n\n" ≈ 2 tokens × 3 = 6 tokens
-        Total ≈ 20 tokens (reserve 30 for safety)
-        """
-        fixed_cost = 30
-        self.effective_max_tokens -= fixed_cost
-        logger.debug(
-            f"Reserved {fixed_cost} tokens for MARKDOWN headers, "
-            f"effective budget: {self.effective_max_tokens}"
-        )
-
-    def _calculate_overhead(self, item: PackableItem) -> int:
-        """
-        Calculate text formatting overhead.
-
-        Overhead depends on text_format:
-        - RAW: Only separator tokens
-        - MARKDOWN: Marginal costs (bullet points, newlines) - headers pre-reserved
-        - XML: Separator + "<role>\\n" + "\\n</role>" tokens
-
-        Args:
-            item: Item to calculate overhead for
-
-        Returns:
-            Number of overhead tokens
-        """
-        overhead = 0
-
-        # Format-specific overhead
-        if self.text_format == TextFormat.RAW:
-            # Separator overhead (applied between items)
-            if self.separator:
-                overhead += self._count_tokens(self.separator)
-
-        elif self.text_format == TextFormat.MARKDOWN:
-            # Marginal cost only (headers are pre-reserved in __init__)
-            # Calculate cost of list bullets or conversation prefixes
-            if item.role == "system":
-                # System items concatenated directly, minimal overhead
-                overhead = 0
-            elif item.role is None:
-                # RAG documents become "- Content\n\n"
-                # Overhead: "\n\n- " ≈ 3 tokens
-                overhead = 3
-            elif item.role in ["user", "assistant"]:
-                # Conversation becomes "User: Content\n" or "Assistant: Content\n"
-                # Overhead: "\nUser: " or "\nAssistant: " ≈ 3-4 tokens
-                overhead = 4
-            else:
-                overhead = 3  # Default fallback
-
-        elif self.text_format == TextFormat.XML:
-            # Separator + XML tags
-            if self.separator:
-                overhead += self._count_tokens(self.separator)
-            role_label = item.role or "context"
-            opening = f"<{role_label}>\n"
-            closing = f"\n</{role_label}>"
-            overhead += self._count_tokens(opening) + self._count_tokens(closing)
-
-        return overhead
 
     def _format_item(self, item: PackableItem) -> str:
         """
@@ -381,7 +327,7 @@ class TextPacker(BasePacker):
         """
         Pack items into formatted text for completion APIs.
 
-        MARKDOWN format uses grouped sections to reduce token overhead:
+        MARKDOWN format uses grouped sections:
         - INSTRUCTIONS: System prompts (ROLE_SYSTEM)
         - CONTEXT: RAG documents (ROLE_CONTEXT)
         - CONVERSATION: User/assistant history (ROLE_USER, ROLE_ASSISTANT)
@@ -394,7 +340,7 @@ class TextPacker(BasePacker):
             >>> prompt = packer.pack()
             >>> response = completion.create(model="llama-2-70b", prompt=prompt)
         """
-        selected_items = self._greedy_select()
+        selected_items = self._select_items()
 
         if not selected_items:
             logger.warning("No items selected, returning empty string")

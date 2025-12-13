@@ -1,6 +1,6 @@
 # Packer Module API Reference
 
-The Packer module provides specialized packers for managing context budgets with priority-based item selection. **Version 0.1.3+** introduces two specialized packers following the Single Responsibility Principle.
+The Packer module provides specialized packers for composing prompts with automatic refinement and priority-based ordering. **Version 0.1.3+** introduces two specialized packers following the Single Responsibility Principle. **Version 0.2.1+** adds default refining strategies and removes token budget constraints.
 
 ## MessagesPacker
 
@@ -71,17 +71,6 @@ from prompt_refiner import (
     packer.add("Urgent RAG doc", role=ROLE_CONTEXT, priority=PRIORITY_QUERY)
     ```
 
-### Overhead Constants
-
-```python
-from prompt_refiner import (
-    PER_MESSAGE_OVERHEAD,  # 4 tokens - ChatML format overhead per message
-    PER_REQUEST_OVERHEAD,  # 3 tokens - Base request overhead (reserved for future use)
-)
-```
-
-These constants reflect the approximate token overhead for OpenAI's ChatML format (`<|im_start|>role\n...\n<|im_end|>`).
-
 ## TextFormat Enum
 
 ```python
@@ -92,30 +81,28 @@ TextFormat.MARKDOWN  # Use ### ROLE: headers (grouped sections in v0.1.3+)
 TextFormat.XML       # Use <role>content</role> tags
 ```
 
-## Token Counting Modes
+## Default Refining Strategies
 
-!!! info "Estimation vs Precise Mode"
-    Both MessagesPacker and TextPacker use the same token counting as CountTokens:
+**Version 0.2.1+** introduces automatic refining strategies. When no explicit refiner is provided, packers apply sensible defaults:
 
-    **Estimation Mode (Default)**
-    - Uses character-based approximation: ~1 token ≈ 4 characters
-    - Applies **10% safety buffer** to prevent context overflow
-    - Example: `max_tokens=1000` → `effective_max_tokens=900`
+- **`system`/`query`**: MinimalStrategy (StripHTML + NormalizeWhitespace)
+- **`context`/`history`**: StandardStrategy (StripHTML + NormalizeWhitespace + Deduplicate)
 
-    ```python
-    packer = MessagesPacker(max_tokens=1000)  # 900 effective tokens
-    ```
+```python
+from prompt_refiner import MessagesPacker
 
-    **Precise Mode (Optional)**
-    - Requires `tiktoken`: `pip install llm-prompt-refiner[token]`
-    - Exact token counting, **no safety buffer** (100% capacity)
-    - Opt-in by passing a `model` parameter
+# Automatic refining with defaults
+packer = MessagesPacker(
+    system="<p>You are helpful.</p>",  # Auto: MinimalStrategy
+    context=["<div>Doc 1</div>"],      # Auto: StandardStrategy
+    query="<span>What's the weather?</span>"  # Auto: MinimalStrategy
+)
 
-    ```python
-    packer = MessagesPacker(max_tokens=1000, model="gpt-4")  # 1000 effective tokens
-    ```
-
-    **Recommendation**: Use precise mode in production when you need maximum token utilization.
+# Override with custom pipeline
+packer = MessagesPacker(
+    context=(["<div>Doc</div>"], StripHTML() | NormalizeWhitespace())
+)
+```
 
 ## Token Savings Tracking
 
@@ -411,18 +398,17 @@ messages2 = packer.pack()
 
 ## Algorithm Details
 
-1. **Add Phase**: Items are added with priorities, optional roles, and optional JIT refinement
-2. **Token Counting**:
-   - MessagesPacker: content tokens + 4 tokens overhead (ChatML format)
-   - TextPacker RAW: content tokens + separator overhead
-   - TextPacker MARKDOWN: content tokens + marginal overhead (3-4 tokens per item after fixed header reservation)
-   - TextPacker XML: content tokens + tag overhead
-3. **Sort Phase**: Items are sorted by priority (lower number = higher priority)
-4. **Greedy Packing**: Items are selected sequentially if they fit within the token budget
-5. **Order Restoration**: Selected items are restored to insertion order for natural reading flow
+1. **Add Phase**: Items are added with priorities, optional roles, and automatic/explicit refinement
+2. **Refinement** (v0.2.1+):
+   - Default strategies applied automatically (MinimalStrategy for system/query, StandardStrategy for context/history)
+   - Override with explicit refiner: `context=(docs, StripHTML() | NormalizeWhitespace())`
+   - Skip refinement: Use `.add()` method with `refine_with=None`
+3. **Token Counting**: Content tokens counted for savings tracking (when enabled)
+4. **Sort Phase**: Items are sorted by priority (lower number = higher priority), stable sort preserves insertion order
+5. **Order Restoration**: All items restored to insertion order for natural reading flow
 6. **Format Phase**:
-   - MessagesPacker: Returns `List[Dict[str, str]]`
-   - TextPacker: Returns formatted `str` based on `text_format`
+   - MessagesPacker: Returns `List[Dict[str, str]]` (semantic roles mapped to API roles)
+   - TextPacker: Returns formatted `str` based on `text_format` (RAW, MARKDOWN, or XML)
 
 ## Tips
 
@@ -462,14 +448,6 @@ messages2 = packer.pack()
         role=ROLE_CONTEXT,
         refine_with=StripHTML()
     )
-    ```
-
-!!! tip "Monitor Token Usage"
-    Check effective token budget and utilization:
-
-    ```python
-    packer = MessagesPacker(max_tokens=1000)
-    print(f"Effective budget: {packer.effective_max_tokens}")  # 900 in estimation mode
     ```
 
 !!! tip "Grouped MARKDOWN Saves Tokens"

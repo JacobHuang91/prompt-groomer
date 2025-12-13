@@ -13,7 +13,13 @@ from dotenv import load_dotenv
 from openai import OpenAI, pydantic_function_tool
 from pydantic import BaseModel, Field
 
-from prompt_refiner import MessagesPacker, ResponseCompressor, SchemaCompressor, StripHTML
+from prompt_refiner import (
+    MessagesPacker,
+    NormalizeWhitespace,
+    ResponseCompressor,
+    SchemaCompressor,
+    StripHTML,
+)
 
 # Load environment variables
 load_dotenv()
@@ -39,21 +45,32 @@ def main():
     print("=" * 80)
     print()
 
-    # 1. Pack messages with token budget (track savings from JIT cleaning)
+    # 1. Pack messages (track savings from automatic refinement)
+    #
+    # Default refining strategies:
+    # - system/query: MinimalStrategy (StripHTML + NormalizeWhitespace)
+    # - context/history: StandardStrategy (StripHTML + NormalizeWhitespace + Deduplicate)
+    #
+    # You can override with custom pipelines:
+    # - Use tuple: (content, refiner_or_pipeline)
+    # - Example: context=(["<div>Doc</div>"], StripHTML() | NormalizeWhitespace())
+
     packer = MessagesPacker(
-        max_tokens=1000,
         model="gpt-4o-mini",
         track_savings=True,
-        system="You are a helpful AI assistant that helps users find books.",
+        # system uses default MinimalStrategy (StripHTML + NormalizeWhitespace)
+        system="<p>You are a helpful AI assistant    that    helps users find books.</p>",
+        # context with explicit pipeline (overrides default StandardStrategy)
         context=(
             [
                 "<div><h1>Installation    Guide</h1><p>To   install   prompt-refiner, use pip install llm-prompt-refiner.</p></div>",
                 "<div><h2>Features</h2><p>Our    library    provides    token    optimization    and    context    management.</p></div>",
                 "<section><h2>Documentation</h2><p>Visit   our   GitHub   for   complete   documentation   and   examples.</p></section>",
             ],
-            [StripHTML()]
+            StripHTML() | NormalizeWhitespace()  # Pipeline: chain multiple operations
         ),
-        query="Search for books about Python programming."
+        # query uses default MinimalStrategy
+        query="<span>Search    for    books about Python programming.</span>"
     )
 
     messages = packer.pack()
