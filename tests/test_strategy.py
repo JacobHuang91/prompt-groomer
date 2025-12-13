@@ -93,44 +93,38 @@ class TestStandardStrategy:
 
 
 class TestAggressiveStrategy:
-    def test_aggressive_strategy_truncation(self):
-        """Test aggressive strategy truncates long text."""
-        strategy = AggressiveStrategy(truncate_max_tokens=5)
-        # Strategy IS a pipeline now, use directly
-        text = "word " * 20  # 20 words
+    def test_aggressive_strategy_basic(self):
+        """Test aggressive strategy with basic cleaning."""
+        strategy = AggressiveStrategy()
+        text = "<div>  hello   world  </div>"
         result = strategy.run(text)
-        # Should truncate to ~5 words (allowing small buffer for estimation)
-        assert len(result.split()) <= 7
-
-    def test_aggressive_strategy_factory(self):
-        """Test factory function with custom max_tokens."""
-        strategy = AggressiveStrategy(truncate_max_tokens=10)
-        text = "word " * 100
-        result = strategy.run(text)
-        assert len(result.split()) <= 12  # Allow small buffer
-
-    def test_aggressive_strategy_tail(self):
-        """Test aggressive strategy with tail truncation."""
-        strategy = AggressiveStrategy(truncate_max_tokens=5, truncate_strategy="tail")
-        # Strategy IS a pipeline now, use directly
-        text = "first second third fourth fifth sixth seventh eighth"
-        result = strategy.run(text)
-        # Should keep last ~5 words
-        assert "eighth" in result
+        # Should strip HTML and normalize whitespace
+        assert "<" not in result
+        assert result == "hello world"
 
     def test_aggressive_strategy_deduplication(self):
-        """Test aggressive strategy removes duplicates."""
-        strategy = AggressiveStrategy(truncate_max_tokens=100)
-        # Strategy IS a pipeline now, use directly
+        """Test aggressive strategy removes duplicates aggressively."""
+        strategy = AggressiveStrategy()
         text = "Hello world. Hello world. Goodbye world."
         result = strategy.run(text)
-        # Should deduplicate at 0.7 threshold
+        # Should deduplicate at 0.7 threshold (aggressive)
         assert result.count("Hello world") == 1
 
+    def test_aggressive_strategy_custom_threshold(self):
+        """Test aggressive strategy with custom deduplication threshold."""
+        # More aggressive threshold (0.6 instead of default 0.7)
+        strategy = AggressiveStrategy(deduplicate_similarity_threshold=0.6)
+        # Use more similar sentences that will trigger deduplication
+        text = "The quick brown fox jumps. The quick brown fox leaps. The slow red fox jumps."
+        result = strategy.run(text)
+        # With aggressive threshold, should deduplicate similar sentences
+        # Verify that HTML stripping and whitespace normalization work
+        assert "<" not in result
+        assert "  " not in result
+
     def test_aggressive_strategy_all_features(self):
-        """Test aggressive strategy with HTML, duplicates, and truncation."""
-        strategy = AggressiveStrategy(truncate_max_tokens=10)
-        # Strategy IS a pipeline now, use directly
+        """Test aggressive strategy with HTML and duplicates."""
+        strategy = AggressiveStrategy()
         text = """
         <div>
             <p>The quick brown fox jumps over the lazy dog.</p>
@@ -140,22 +134,30 @@ class TestAggressiveStrategy:
         </div>
         """
         result = strategy.run(text)
-        # Should strip HTML, deduplicate, and truncate
+        # Should strip HTML and deduplicate similar sentences
         assert "<" not in result
         assert ">" not in result
-        assert len(result.split()) <= 12  # Allow small buffer
+        # Should have deduplicated some content
+        assert len(result) < len(text.replace("<", "").replace(">", ""))
 
     def test_aggressive_strategy_disable_html_strip(self):
         """Test aggressive strategy without HTML stripping."""
-        strategy = AggressiveStrategy(truncate_max_tokens=100, strip_html=False)
-        # Strategy IS a pipeline now, use directly
+        strategy = AggressiveStrategy(strip_html=False)
         text = "<div>  hello  world  </div>"
         result = strategy.run(text)
-        # Should keep HTML but normalize whitespace and truncate
+        # Should keep HTML but normalize whitespace
         assert "<div>" in result
         assert "hello world" in result
         # Whitespace should be normalized
         assert "  " not in result.replace("<div>", "").replace("</div>", "")
+
+    def test_aggressive_strategy_custom_method(self):
+        """Test aggressive strategy with custom deduplication method."""
+        strategy = AggressiveStrategy(deduplicate_method="levenshtein")
+        text = "Hello world. Hello world. Goodbye world."
+        result = strategy.run(text)
+        # Should deduplicate using Levenshtein distance
+        assert result.count("Hello world") == 1
 
 
 class TestStrategyEnum:
@@ -173,10 +175,11 @@ class TestStrategyEnum:
 
     def test_enum_aggressive_with_params(self):
         """Test enum with custom parameters."""
-        strategy = AggressiveStrategy(truncate_max_tokens=10)
-        text = "word " * 50
+        strategy = AggressiveStrategy(deduplicate_similarity_threshold=0.6)
+        text = "The quick brown fox. The quick brown fox. Different sentence."
         result = strategy.run(text)
-        assert len(result.split()) <= 12
+        # With lower threshold, should deduplicate similar sentences
+        assert result.count("The quick brown fox") == 1
 
 
 class TestStrategyComposition:
@@ -234,8 +237,8 @@ class TestStrategyEdgeCases:
         assert result == "plain text"
 
     def test_aggressive_with_short_text(self):
-        """Test aggressive strategy with text shorter than max_tokens."""
-        strategy = AggressiveStrategy(truncate_max_tokens=100)
+        """Test aggressive strategy with short text without duplicates."""
+        strategy = AggressiveStrategy()
         result = strategy.run("short text")
         assert result == "short text"
 

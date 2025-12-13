@@ -31,59 +31,48 @@
 Build AI agents, RAG applications, and chatbots with automatic token optimization and smart context management. Here's a complete example (see [`examples/quickstart.py`](examples/quickstart.py) for full code):
 
 ```python
-from prompt_refiner import MessagesPacker, SchemaCompressor, ResponseCompressor, StripHTML
-from openai import OpenAI, pydantic_function_tool
-from pydantic import BaseModel, Field
+from prompt_refiner import MessagesPacker, SchemaCompressor, ResponseCompressor, StripHTML, NormalizeWhitespace
 
-# 1. Pack messages with token budget and track savings
+# 1. Pack messages (automatic refining with default strategies)
 packer = MessagesPacker(
-    max_tokens=1000,
     model="gpt-4o-mini",
     track_savings=True,
-    system="You are a helpful AI assistant that helps users find books.",
-    context=(
-        ["<div><h1>Installation Guide</h1>...</div>"],
-        [StripHTML()]
-    ),
-    query="Search for books about Python programming."
+    system="<p>You are a helpful AI assistant.</p>",
+    context=(["<div>Installation Guide...</div>"], StripHTML() | NormalizeWhitespace()),
+    query="<span>Search for Python books.</span>"
 )
 messages = packer.pack()
 
-# Get token savings
-savings = packer.get_token_savings()
-print(f"Saved {savings['saved_tokens']} tokens ({savings['savings_rate']:.1%})")
-
-# 2. Compress tool schema (139 → 131 tokens, 5.8% saved)
-class SearchBooksInput(BaseModel):
-    query: str = Field(description="Search query to find books")
-
+# 2. Compress tool schema
 tool_schema = pydantic_function_tool(SearchBooksInput, name="search_books")
 compressed_schema = SchemaCompressor().process(tool_schema)
 
-# 3. Execute tool call with OpenAI
-client = OpenAI()
+# 3. Call LLM with compressed schema
 response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=messages,
-    tools=[compressed_schema]
+    model="gpt-4o-mini", messages=messages, tools=[compressed_schema]
 )
-tool_call = response.choices[0].message.tool_calls[0]
-tool_response = search_books(**json.loads(tool_call.function.arguments))
 
-# 4. Compress tool response (19251 → 12813 tokens, 33.4% saved)
+# 4. Compress tool response
+tool_response = search_books(**json.loads(tool_call.function.arguments))
 compressed_response = ResponseCompressor().process(tool_response)
 ```
+
+**Default refining strategies:**
+- `system`/`query`: MinimalStrategy (StripHTML + NormalizeWhitespace)
+- `context`/`history`: StandardStrategy (StripHTML + NormalizeWhitespace + Deduplicate)
+- Override with tuple: `context=(docs, StripHTML() | NormalizeWhitespace())`
 
 > 💡 Run `python examples/quickstart.py` to see the complete workflow with real OpenAI API verification.
 
 **Key benefits:**
 
+- **Default strategies** - Automatic refining (MinimalStrategy for system/query, StandardStrategy for context/history)
 - **Tool schema compression** - Save 10-15% tokens on AI agent function definitions
 - **Tool response compression** - Save 30-70% tokens on agent tool outputs
 - **Compose operations** with `|` - Chain multiple cleaners into a pipeline
 - **Save 10-20% tokens** - Remove HTML, whitespace, duplicates, and redact PII automatically
-- **Stay within budget** - MessagesPacker fits everything into 1000 tokens using priority-based selection
-- **JIT cleaning** - Clean content on-the-fly with `refine_with` parameter
+- **All items included** - No token budget limits, let LLM APIs handle final truncation
+- **Track savings** - Measure token optimization impact with built-in savings tracking
 - **Production ready** - Output goes directly to OpenAI without extra steps
 
 ### ✨ Key Features

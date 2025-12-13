@@ -20,7 +20,7 @@ from prompt_refiner import (
 
 def test_messages_packer_basic():
     """Test basic message packing."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     packer.add("System prompt", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
     packer.add("User query", role=ROLE_USER, priority=PRIORITY_QUERY)
@@ -35,7 +35,7 @@ def test_messages_packer_basic():
 
 def test_messages_packer_priority_order():
     """Test that items are selected by priority."""
-    packer = MessagesPacker(max_tokens=50)
+    packer = MessagesPacker()
 
     packer.add("low", role=ROLE_USER, priority=PRIORITY_LOW)
     packer.add("high", role=ROLE_USER, priority=PRIORITY_HIGH)
@@ -50,7 +50,7 @@ def test_messages_packer_priority_order():
 
 def test_messages_packer_insertion_order():
     """Test that insertion order is preserved."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     packer.add("first", role=ROLE_USER, priority=PRIORITY_MEDIUM)
     packer.add("second", role=ROLE_USER, priority=PRIORITY_MEDIUM)
@@ -66,7 +66,7 @@ def test_messages_packer_insertion_order():
 
 def test_messages_packer_semantic_role_mapping():
     """Test that semantic roles are mapped to API-compatible roles."""
-    packer = MessagesPacker(max_tokens=200)
+    packer = MessagesPacker()
 
     # Add items with semantic roles
     packer.add("System instruction", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
@@ -89,7 +89,7 @@ def test_messages_packer_semantic_role_mapping():
 
 def test_messages_packer_jit_refinement():
     """Test JIT refinement with operations."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     dirty_html = "<div><p>Clean this</p></div>"
     packer.add(dirty_html, role=ROLE_USER, priority=PRIORITY_HIGH, refine_with=StripHTML())
@@ -102,7 +102,7 @@ def test_messages_packer_jit_refinement():
 
 def test_messages_packer_chained_operations():
     """Test chaining multiple operations in JIT refinement."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     messy = "<p>  Multiple   spaces  </p>"
     packer.add(
@@ -121,7 +121,7 @@ def test_messages_packer_chained_operations():
 
 def test_messages_packer_empty():
     """Test packer with no items."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
     messages = packer.pack()
 
     assert messages == []
@@ -130,7 +130,7 @@ def test_messages_packer_empty():
 def test_messages_packer_method_chaining():
     """Test fluent API with method chaining."""
     messages = (
-        MessagesPacker(max_tokens=100)
+        MessagesPacker()
         .add("system", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
         .add("user", role=ROLE_USER, priority=PRIORITY_QUERY)
         .pack()
@@ -143,7 +143,7 @@ def test_messages_packer_method_chaining():
 
 def test_messages_packer_reset():
     """Test resetting the packer."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     packer.add("item1", role=ROLE_USER, priority=PRIORITY_HIGH)
     packer.add("item2", role=ROLE_USER, priority=PRIORITY_HIGH)
@@ -163,7 +163,7 @@ def test_messages_packer_reset():
 
 def test_messages_packer_get_items():
     """Test getting item metadata."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     packer.add("first", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
     packer.add("second", role=ROLE_USER, priority=PRIORITY_QUERY)
@@ -179,7 +179,7 @@ def test_messages_packer_get_items():
 
 def test_messages_packer_add_messages_helper():
     """Test add_messages helper method."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     conversation = [
         {"role": "system", "content": "You are helpful."},
@@ -199,7 +199,7 @@ def test_messages_packer_add_messages_helper():
 
 def test_messages_packer_rag_scenario():
     """Test realistic RAG scenario with semantic roles."""
-    packer = MessagesPacker(max_tokens=200)
+    packer = MessagesPacker()
 
     # System prompt
     packer.add("You are a QA bot.", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
@@ -223,7 +223,7 @@ def test_messages_packer_rag_scenario():
 
 def test_messages_packer_conversation_history():
     """Test managing conversation history with priorities."""
-    packer = MessagesPacker(max_tokens=100)
+    packer = MessagesPacker()
 
     # System prompt (high priority)
     packer.add("You are a chatbot.", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
@@ -243,8 +243,8 @@ def test_messages_packer_conversation_history():
 
 
 def test_messages_packer_budget_enforcement():
-    """Test that token budget is enforced."""
-    packer = MessagesPacker(max_tokens=30)
+    """Test that all items are included (no budget limit)."""
+    packer = MessagesPacker()
 
     # Add many items
     for i in range(10):
@@ -252,9 +252,8 @@ def test_messages_packer_budget_enforcement():
 
     messages = packer.pack()
 
-    # Should fit only some messages within budget
-    assert len(messages) < 10
-    assert len(messages) > 0
+    # All items should be included
+    assert len(messages) == 10
 
 
 def test_messages_packer_unlimited_mode():
@@ -272,13 +271,11 @@ def test_messages_packer_unlimited_mode():
 
     # All items should be included
     assert len(messages) == 22
-    assert packer.effective_max_tokens is None
-    assert packer.raw_max_tokens is None
 
 
 def test_messages_packer_smart_defaults():
     """Test smart priority defaults based on semantic roles."""
-    packer = MessagesPacker(max_tokens=200)
+    packer = MessagesPacker()
 
     # Smart defaults: no priority parameter needed!
     packer.add("System instruction", role=ROLE_SYSTEM)  # Auto: PRIORITY_SYSTEM (0)
@@ -314,7 +311,7 @@ def test_messages_packer_smart_defaults():
 
 def test_messages_packer_unknown_role():
     """Test that unknown roles default to PRIORITY_MEDIUM."""
-    packer = MessagesPacker(max_tokens=500)
+    packer = MessagesPacker()
 
     # Add item with unknown role (not one of the semantic constants)
     packer.add("Custom content", role="custom_role")
@@ -333,7 +330,7 @@ def test_messages_packer_unknown_role():
 
 def test_token_savings_tracking_enabled():
     """Test that token savings are tracked when enabled."""
-    packer = MessagesPacker(max_tokens=500, track_savings=True)
+    packer = MessagesPacker(track_savings=True)
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test</p></div>"
@@ -358,7 +355,7 @@ def test_token_savings_tracking_enabled():
 
 def test_token_savings_tracking_disabled():
     """Test that token savings are not tracked when disabled by default."""
-    packer = MessagesPacker(max_tokens=500)  # track_savings defaults to False
+    packer = MessagesPacker()  # track_savings defaults to False
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test</p></div>"
@@ -373,7 +370,7 @@ def test_token_savings_tracking_disabled():
 
 def test_token_savings_no_refinement():
     """Test that empty dict is returned when no items are refined."""
-    packer = MessagesPacker(max_tokens=500, track_savings=True)
+    packer = MessagesPacker(track_savings=True)
 
     # Add items WITHOUT refinement
     packer.add("Clean content", role=ROLE_SYSTEM)
@@ -388,7 +385,7 @@ def test_token_savings_no_refinement():
 
 def test_token_savings_multiple_items():
     """Test that savings are aggregated across multiple refined items."""
-    packer = MessagesPacker(max_tokens=1000, track_savings=True)
+    packer = MessagesPacker(track_savings=True)
 
     # Add multiple items with refinement
     dirty_html1 = "<div><p>First document</p></div>"
@@ -413,7 +410,7 @@ def test_token_savings_multiple_items():
 
 def test_token_savings_reset():
     """Test that reset clears savings statistics."""
-    packer = MessagesPacker(max_tokens=500, track_savings=True)
+    packer = MessagesPacker(track_savings=True)
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test</p></div>"
@@ -442,7 +439,7 @@ def test_token_savings_reset():
 def test_token_savings_with_model():
     """Test that token savings work with precise token counting."""
     # Note: This test works whether or not tiktoken is installed
-    packer = MessagesPacker(max_tokens=500, model="gpt-4", track_savings=True)
+    packer = MessagesPacker(model="gpt-4", track_savings=True)
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test with precise counting</p></div>"
@@ -464,7 +461,7 @@ def test_token_savings_with_model():
 
 def test_constructor_with_system():
     """Test constructor with system parameter."""
-    packer = MessagesPacker(max_tokens=100, system="You are a helpful assistant.")
+    packer = MessagesPacker(system="You are a helpful assistant.")
 
     messages = packer.pack()
 
@@ -475,7 +472,7 @@ def test_constructor_with_system():
 
 def test_constructor_with_context():
     """Test constructor with context parameter."""
-    packer = MessagesPacker(max_tokens=200, context=["Doc 1", "Doc 2", "Doc 3"])
+    packer = MessagesPacker(context=["Doc 1", "Doc 2", "Doc 3"])
 
     messages = packer.pack()
 
@@ -489,7 +486,6 @@ def test_constructor_with_context():
 def test_constructor_with_history():
     """Test constructor with history parameter."""
     packer = MessagesPacker(
-        max_tokens=200,
         history=[
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
@@ -507,7 +503,7 @@ def test_constructor_with_history():
 
 def test_constructor_with_query():
     """Test constructor with query parameter."""
-    packer = MessagesPacker(max_tokens=100, query="What's the weather?")
+    packer = MessagesPacker(query="What's the weather?")
 
     messages = packer.pack()
 
@@ -519,7 +515,6 @@ def test_constructor_with_query():
 def test_constructor_with_all_parameters():
     """Test constructor with all parameters."""
     packer = MessagesPacker(
-        max_tokens=500,
         system="You are helpful.",
         context=["Doc 1", "Doc 2"],
         history=[{"role": "user", "content": "Hi"}],
@@ -536,9 +531,7 @@ def test_constructor_with_all_parameters():
 
 def test_constructor_with_system_and_refiner():
     """Test constructor with system and refiner using tuple syntax."""
-    packer = MessagesPacker(
-        max_tokens=200, system=("You    are    helpful.", Pipeline([NormalizeWhitespace()]))
-    )
+    packer = MessagesPacker(system=("You    are    helpful.", Pipeline([NormalizeWhitespace()])))
 
     messages = packer.pack()
 
@@ -548,9 +541,7 @@ def test_constructor_with_system_and_refiner():
 
 def test_constructor_with_context_and_refiner():
     """Test constructor with context and refiner using tuple syntax."""
-    packer = MessagesPacker(
-        max_tokens=300, context=(["<div>Doc 1</div>", "<p>Doc 2</p>"], Pipeline([StripHTML()]))
-    )
+    packer = MessagesPacker(context=(["<div>Doc 1</div>", "<p>Doc 2</p>"], Pipeline([StripHTML()])))
 
     messages = packer.pack()
 
@@ -562,7 +553,6 @@ def test_constructor_with_context_and_refiner():
 def test_constructor_with_history_and_refiner():
     """Test constructor with history and refiner using tuple syntax."""
     packer = MessagesPacker(
-        max_tokens=200,
         history=(
             [{"role": "user", "content": "Hello    world"}],
             Pipeline([NormalizeWhitespace()]),
@@ -577,9 +567,7 @@ def test_constructor_with_history_and_refiner():
 
 def test_constructor_with_query_and_refiner():
     """Test constructor with query and refiner using tuple syntax."""
-    packer = MessagesPacker(
-        max_tokens=100, query=("<div>What's the weather?</div>", Pipeline([StripHTML()]))
-    )
+    packer = MessagesPacker(query=("<div>What's the weather?</div>", Pipeline([StripHTML()])))
 
     messages = packer.pack()
 
@@ -590,7 +578,7 @@ def test_constructor_with_query_and_refiner():
 def test_constructor_with_track_savings():
     """Test constructor with track_savings enabled."""
     packer = MessagesPacker(
-        max_tokens=200, track_savings=True, context=(["<div>Test</div>"], Pipeline([StripHTML()]))
+        track_savings=True, context=(["<div>Test</div>"], Pipeline([StripHTML()]))
     )
 
     messages = packer.pack()
@@ -651,16 +639,6 @@ def test_quick_pack_with_refiners():
     assert any(msg["content"] == "Doc 1" for msg in messages)
 
 
-def test_quick_pack_with_max_tokens():
-    """Test quick_pack with token budget."""
-    messages = MessagesPacker.quick_pack(
-        max_tokens=50, system="System", context=["Very long context " * 100], query="Query"
-    )
-
-    # Should respect token budget
-    assert len(messages) >= 2  # At least system and query
-
-
 def test_quick_pack_with_model():
     """Test quick_pack with model parameter."""
     messages = MessagesPacker.quick_pack(model="gpt-4", system="You are helpful.", query="Test")
@@ -681,7 +659,7 @@ def test_quick_pack_with_track_savings():
 
 def test_constructor_and_add_method_combined():
     """Test that constructor parameters and add() method work together."""
-    packer = MessagesPacker(max_tokens=500, system="You are helpful.")
+    packer = MessagesPacker(system="You are helpful.")
 
     # Add more items using traditional API
     packer.add("Additional context", role=ROLE_CONTEXT)
@@ -799,3 +777,92 @@ class TestRefinerReuse:
 
         assert messages[0]["content"] == "System"  # HTML stripped
         assert messages[1]["content"] == "Query with spaces"  # Whitespace normalized
+
+
+class TestDefaultStrategies:
+    """Test automatic default strategy application."""
+
+    def test_default_strategies_applied_automatically(self):
+        """Test that default strategies are applied when no explicit refiner provided."""
+        packer = MessagesPacker(
+            system="<p>You are helpful.</p>   ",
+            context=["<div>Document   1</div>"],
+            query="<span>What's the   weather?</span>",
+        )
+        messages = packer.pack()
+
+        # HTML should be stripped and whitespace normalized
+        # Order: system, context, query (insertion order from constructor)
+        assert messages[0]["content"] == "You are helpful."
+        assert messages[1]["content"] == "Document 1"
+        assert messages[2]["content"] == "What's the weather?"
+
+    def test_raw_content_via_add_method(self):
+        """Test that .add() method with refine_with=None provides raw content."""
+        packer = MessagesPacker()
+        packer.add("<p>You are helpful.</p>   ", role="system", refine_with=None)
+        packer.add("<span>What's the   weather?</span>", role="query", refine_with=None)
+        packer.add("<div>Document   1</div>", role="context", refine_with=None)
+        messages = packer.pack()
+
+        # Content should be unchanged
+        assert messages[0]["content"] == "<p>You are helpful.</p>   "
+        assert messages[1]["content"] == "<span>What's the   weather?</span>"
+        assert messages[2]["content"] == "<div>Document   1</div>"
+
+    def test_explicit_refiner_overrides_default(self):
+        """Test that explicit refiner overrides default strategy."""
+        custom_refiner = StripHTML()  # Only strip HTML, don't normalize whitespace
+
+        packer = MessagesPacker(
+            system=("<p>System   with   spaces</p>", custom_refiner),
+            query="<span>Query   with   spaces</span>",  # Will use default
+        )
+        messages = packer.pack()
+
+        # Custom refiner only strips HTML, keeps whitespace
+        assert messages[0]["content"] == "System   with   spaces"
+        # Default strategy strips HTML and normalizes whitespace
+        assert messages[1]["content"] == "Query with spaces"
+
+    def test_default_strategies_with_quick_pack(self):
+        """Test default strategies work with quick_pack method."""
+        messages = MessagesPacker.quick_pack(
+            system="<p>System</p>",
+            context=["<div>Context</div>"],
+            query="<span>Query</span>",
+        )
+
+        # Order: system, context, query (insertion order from constructor)
+        assert messages[0]["content"] == "System"
+        assert messages[1]["content"] == "Context"
+        assert messages[2]["content"] == "Query"
+
+    def test_context_uses_standard_strategy(self):
+        """Test that context uses StandardStrategy (includes deduplication)."""
+        # Add duplicate context documents
+        packer = MessagesPacker(
+            context=[
+                "<p>Document A. This is a test.</p>",
+                "<p>Document B. This is a test.</p>",  # Very similar to A
+            ]
+        )
+        messages = packer.pack()
+
+        # StandardStrategy includes Deduplicate, so similar content may be reduced
+        # At minimum, HTML should be stripped
+        assert all("<" not in msg["content"] for msg in messages)
+
+    def test_history_uses_standard_strategy(self):
+        """Test that history uses StandardStrategy."""
+        packer = MessagesPacker(
+            history=[
+                {"role": "user", "content": "<p>Hello   there</p>"},
+                {"role": "assistant", "content": "<p>Hi   back</p>"},
+            ]
+        )
+        messages = packer.pack()
+
+        # StandardStrategy strips HTML and normalizes whitespace
+        assert messages[0]["content"] == "Hello there"
+        assert messages[1]["content"] == "Hi back"

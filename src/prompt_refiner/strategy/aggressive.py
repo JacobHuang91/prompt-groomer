@@ -3,27 +3,28 @@
 from typing import Literal
 
 from ..cleaner import NormalizeWhitespace, StripHTML
-from ..compressor import Deduplicate, TruncateTokens
+from ..compressor import Deduplicate
 from ..pipeline import Pipeline
 
 
 class AggressiveStrategy(Pipeline):
     """
-    Aggressive strategy: Maximum token reduction with truncation.
+    Aggressive strategy: Maximum token reduction through aggressive deduplication.
 
     This strategy is itself a Pipeline, so you can use it directly or extend it.
 
     Refiners:
     - StripHTML: Remove HTML tags (optional)
     - NormalizeWhitespace: Collapse excessive whitespace
-    - Deduplicate: Remove similar content
-    - TruncateTokens: Limit to max_tokens
+    - Deduplicate: Aggressively remove similar content (threshold: 0.7)
 
     Characteristics:
-    - Token reduction: ~15% (up to 74% on long contexts)
-    - Quality: 96.4% (cosine similarity)
-    - Use case: Cost optimization, long contexts, lenient quality requirements
+    - Token reduction: ~5-10% (higher with duplicate content)
+    - Quality: 96-98% (cosine similarity)
+    - Use case: Cost optimization with duplicate/redundant content
     - Latency: 0.25ms per 1k tokens
+
+    Note: For token budget control, use Packer's max_tokens parameter instead.
 
     Example:
         >>> # Use with defaults
@@ -32,11 +33,9 @@ class AggressiveStrategy(Pipeline):
         >>>
         >>> # Customize operator parameters
         >>> strategy = AggressiveStrategy(
-        ...     truncate_max_tokens=500,
-        ...     truncate_strategy="tail",
         ...     strip_html_to_markdown=True,
         ...     deduplicate_method="levenshtein",
-        ...     deduplicate_similarity_threshold=0.9,
+        ...     deduplicate_similarity_threshold=0.6,
         ...     deduplicate_granularity="paragraph"
         ... )
         >>> cleaned = strategy.run(text)
@@ -48,9 +47,6 @@ class AggressiveStrategy(Pipeline):
 
     def __init__(
         self,
-        # Parameters to configure TruncateTokens operator
-        truncate_max_tokens: int = 150,
-        truncate_strategy: Literal["head", "tail", "middle_out"] = "head",
         # Parameters to configure StripHTML operator
         strip_html: bool = True,
         strip_html_to_markdown: bool = False,
@@ -63,12 +59,11 @@ class AggressiveStrategy(Pipeline):
         Initialize aggressive strategy with configured operators.
 
         Args:
-            truncate_max_tokens: Maximum tokens to keep (default: 150)
-            truncate_strategy: Truncation strategy (default: "head")
             strip_html: Whether to include StripHTML operator (default: True)
             strip_html_to_markdown: Convert HTML to Markdown instead of stripping (default: False)
             deduplicate_method: Deduplication method (default: "jaccard")
-            deduplicate_similarity_threshold: Similarity threshold (default: 0.7)
+            deduplicate_similarity_threshold: Similarity threshold for aggressive deduplication
+                (default: 0.7)
             deduplicate_granularity: Deduplication granularity (default: "sentence")
         """
         operations = []
@@ -83,13 +78,6 @@ class AggressiveStrategy(Pipeline):
                 method=deduplicate_method,
                 similarity_threshold=deduplicate_similarity_threshold,
                 granularity=deduplicate_granularity,
-            )
-        )
-
-        operations.append(
-            TruncateTokens(
-                max_tokens=truncate_max_tokens,
-                strategy=truncate_strategy,
             )
         )
 

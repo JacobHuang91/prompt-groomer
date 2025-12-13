@@ -7,9 +7,9 @@ This document provides context for Claude Code and developers working on this pr
 Prompt Refiner is a Python library for building production LLM applications. It solves two core problems:
 
 1. **Token Optimization** - Clean dirty inputs (HTML, whitespace, PII) to reduce API costs by 10-20%
-2. **Context Management** - Pack system prompts, RAG docs, and chat history into token budgets with smart priority-based selection
+2. **Context Management** - Pack system prompts, RAG docs, and chat history with automatic refinement and priority-based ordering
 
-Perfect for RAG applications, chatbots, and any production system that needs to manage LLM context windows efficiently.
+Perfect for RAG applications, chatbots, and any production system that needs to optimize LLM inputs efficiently.
 
 ## Architecture
 
@@ -20,17 +20,16 @@ The library is organized into 6 core transformation modules plus measurement uti
 - **Compressor**: Operations for reducing prompt size (truncation, deduplication)
 - **Scrubber**: Operations for security and privacy (PII redaction)
 - **Tools**: Operations for optimizing LLM tool schemas and responses (SchemaCompressor, ResponseCompressor) (v0.1.6+)
-- **Packer**: Context budget management with specialized packers (v0.1.3+)
+- **Packer**: Context composition with specialized packers and automatic refinement (v0.1.3+)
 - **Strategy**: Benchmark-tested preset strategies (MinimalStrategy, StandardStrategy, AggressiveStrategy) (v0.1.5+)
   - **MessagesPacker**: For chat completion APIs (OpenAI, Anthropic)
   - **TextPacker**: For text completion APIs (Llama Base, GPT-3)
   - **Semantic roles for RAG**: ROLE_SYSTEM, ROLE_QUERY, ROLE_CONTEXT, ROLE_USER, ROLE_ASSISTANT
   - **Smart priority defaults**: Role automatically infers priority (PRIORITY_SYSTEM, PRIORITY_QUERY, PRIORITY_HIGH, PRIORITY_LOW)
-  - Priority-based greedy packing algorithm
-  - Automatic ChatML format overhead accounting (~4 tokens per message)
+  - **Default refining strategies**: Automatic cleaning (MinimalStrategy for system/query, StandardStrategy for context/history) (v0.2.1+)
+  - Priority-based ordering with insertion order preservation
   - Grouped MARKDOWN sections for base models
-  - "Entrance fee" strategy for maximum token utilization
-  - Context window management for RAG applications, chatbots, and conversation history
+  - Token savings tracking for optimization impact measurement
 
 **Measurement Utilities (Analyze, don't transform):**
 - **Analyzer**: Operations for measuring optimization impact (token counting, cost savings)
@@ -47,7 +46,48 @@ Each core module contains specialized operations that can be composed into pipel
 
 ## Version History
 
-### v0.2.0 (Current) - Strategy Refactoring
+### v0.2.1 (Current) - Packer Simplification & Default Strategies
+**BREAKING CHANGES:**
+
+**Packer Simplification**
+- **Removed `max_tokens` parameter**: Packers now include all items without token budget constraints
+  - LLM APIs handle final token limits
+  - Simpler API - no more budget management complexity
+  - All items are included and ordered by priority, then insertion order
+- **Removed overhead calculations**: No more `_calculate_overhead()`, `PER_MESSAGE_OVERHEAD`, `PER_REQUEST_OVERHEAD`
+- **Renamed internal method**: `_greedy_select()` → `_select_items()` (simpler logic)
+- **File renames**: `messages_packer.py` → `messages.py`, `text_packer.py` → `text.py`
+
+**Default Refining Strategies (NEW)**
+- Automatic refining applied when no explicit refiner provided:
+  - `system`/`query`: MinimalStrategy (StripHTML + NormalizeWhitespace)
+  - `context`/`history`: StandardStrategy (StripHTML + NormalizeWhitespace + Deduplicate)
+- Override with tuple syntax: `context=(docs, StripHTML() | NormalizeWhitespace())`
+- Improved UX: Clean inputs automatically without explicit configuration
+
+**Migration Guide:**
+```python
+# OLD (v0.2.0)
+packer = MessagesPacker(
+    max_tokens=1000,
+    system="You are helpful.",
+    context=(["<div>Doc</div>"], [StripHTML()])
+)
+
+# NEW (v0.2.1)
+packer = MessagesPacker(
+    system="You are helpful.",  # Auto-refined with MinimalStrategy
+    context=(["<div>Doc</div>"], StripHTML() | NormalizeWhitespace())  # Pipeline with |
+)
+```
+
+**Benefits:**
+- Simpler API (no token budget management)
+- Automatic optimization with sensible defaults
+- Easy to override when needed
+- Cleaner pipeline syntax with `|` operator
+
+### v0.2.0 - Strategy Refactoring
 **BREAKING CHANGES:**
 
 **Strategy Module Refactoring**
@@ -230,8 +270,8 @@ src/prompt_refiner/
 │   └── counter.py
 ├── packer/              # Packer module (v0.1.3+)
 │   ├── base.py          # Abstract base class
-│   ├── messages_packer.py  # Chat completion APIs
-│   └── text_packer.py   # Text completion APIs
+│   ├── messages.py      # Chat completion APIs
+│   └── text.py          # Text completion APIs
 └── strategy/            # Strategy module (v0.1.5+)
     ├── __init__.py
     ├── minimal.py       # MinimalStrategy

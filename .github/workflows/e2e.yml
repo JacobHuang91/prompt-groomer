@@ -1,0 +1,53 @@
+name: E2E Tests (Local Build)
+
+# Test the local build before publishing
+# This ensures PRs and changes work correctly before they reach PyPI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  e2e-local:
+    name: E2E Tests (Local Build)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Build package
+        run: uv build
+
+      - name: Install package from wheel
+        run: |
+          # Find the built wheel file
+          WHEEL_FILE=$(ls dist/*.whl | head -n 1)
+          echo "Installing wheel: $WHEEL_FILE"
+          pip install "$WHEEL_FILE"
+
+      - name: Verify installation
+        run: |
+          python -c "import prompt_refiner; print(f'Installed version: {prompt_refiner.__version__}')"
+
+      - name: Run E2E tests
+        run: |
+          python tests/e2e/test_basic_usage.py
+
+      - name: Test with tiktoken (optional dependency)
+        run: |
+          pip install tiktoken
+          python tests/e2e/test_basic_usage.py

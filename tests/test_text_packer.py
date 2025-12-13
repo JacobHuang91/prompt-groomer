@@ -21,7 +21,7 @@ from prompt_refiner import (
 
 def test_text_packer_basic():
     """Test basic text packing."""
-    packer = TextPacker(max_tokens=100)
+    packer = TextPacker()
 
     packer.add("System prompt", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
     packer.add("User query", role=ROLE_USER, priority=PRIORITY_QUERY)
@@ -35,7 +35,7 @@ def test_text_packer_basic():
 
 def test_text_packer_raw_format():
     """Test RAW format (no delimiters)."""
-    packer = TextPacker(max_tokens=100, text_format=TextFormat.RAW)
+    packer = TextPacker(text_format=TextFormat.RAW)
 
     packer.add("First", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
     packer.add("Second", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
@@ -49,7 +49,7 @@ def test_text_packer_raw_format():
 
 def test_text_packer_markdown_format():
     """Test MARKDOWN format with grouped sections."""
-    packer = TextPacker(max_tokens=200, text_format=TextFormat.MARKDOWN)
+    packer = TextPacker(text_format=TextFormat.MARKDOWN)
 
     packer.add("You are helpful.", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
     packer.add("Hello!", role=ROLE_QUERY, priority=PRIORITY_QUERY)
@@ -65,7 +65,7 @@ def test_text_packer_markdown_format():
 
 def test_text_packer_xml_format():
     """Test XML format."""
-    packer = TextPacker(max_tokens=200, text_format=TextFormat.XML)
+    packer = TextPacker(text_format=TextFormat.XML)
 
     packer.add("You are helpful.", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
     packer.add("Hello!", role=ROLE_USER, priority=PRIORITY_QUERY)
@@ -80,7 +80,7 @@ def test_text_packer_xml_format():
 
 def test_text_packer_custom_separator():
     """Test custom separator."""
-    packer = TextPacker(max_tokens=100, separator=" | ")
+    packer = TextPacker(separator=" | ")
 
     packer.add("first", role=ROLE_CONTEXT, priority=PRIORITY_SYSTEM)
     packer.add("second", role=ROLE_CONTEXT, priority=PRIORITY_SYSTEM)
@@ -92,7 +92,7 @@ def test_text_packer_custom_separator():
 
 def test_text_packer_empty_separator():
     """Test empty separator for maximum compression."""
-    packer = TextPacker(max_tokens=100, separator="")
+    packer = TextPacker(separator="")
 
     packer.add("First", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
     packer.add("Second", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
@@ -104,7 +104,7 @@ def test_text_packer_empty_separator():
 
 def test_text_packer_priority_order():
     """Test that items are selected by priority."""
-    packer = TextPacker(max_tokens=50, text_format=TextFormat.RAW)
+    packer = TextPacker(text_format=TextFormat.RAW)
 
     packer.add("low", role=ROLE_CONTEXT, priority=PRIORITY_LOW)
     packer.add("high", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
@@ -119,7 +119,7 @@ def test_text_packer_priority_order():
 
 def test_text_packer_insertion_order():
     """Test that insertion order is preserved."""
-    packer = TextPacker(max_tokens=100, separator=" ")
+    packer = TextPacker(separator=" ")
 
     packer.add("first", role=ROLE_CONTEXT, priority=PRIORITY_MEDIUM)
     packer.add("second", role=ROLE_CONTEXT, priority=PRIORITY_MEDIUM)
@@ -132,7 +132,7 @@ def test_text_packer_insertion_order():
 
 def test_text_packer_jit_refinement():
     """Test JIT refinement with operations."""
-    packer = TextPacker(max_tokens=100)
+    packer = TextPacker()
 
     dirty_html = "<div><p>Clean this</p></div>"
     packer.add(dirty_html, role=ROLE_CONTEXT, priority=PRIORITY_HIGH, refine_with=StripHTML())
@@ -145,7 +145,7 @@ def test_text_packer_jit_refinement():
 
 def test_text_packer_chained_operations():
     """Test chaining multiple operations."""
-    packer = TextPacker(max_tokens=100)
+    packer = TextPacker()
 
     messy = "<p>  Multiple   spaces  </p>"
     packer.add(
@@ -164,7 +164,7 @@ def test_text_packer_chained_operations():
 
 def test_text_packer_empty():
     """Test packer with no items."""
-    packer = TextPacker(max_tokens=100)
+    packer = TextPacker()
     text = packer.pack()
 
     assert text == ""
@@ -173,7 +173,7 @@ def test_text_packer_empty():
 def test_text_packer_method_chaining():
     """Test fluent API with method chaining."""
     text = (
-        TextPacker(max_tokens=100, separator=" ")
+        TextPacker(separator=" ")
         .add("system", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
         .add("user", role=ROLE_USER, priority=PRIORITY_QUERY)
         .pack()
@@ -185,7 +185,7 @@ def test_text_packer_method_chaining():
 
 def test_text_packer_reset():
     """Test resetting the packer."""
-    packer = TextPacker(max_tokens=100)
+    packer = TextPacker()
 
     packer.add("item1", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
     packer.add("item2", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
@@ -204,7 +204,7 @@ def test_text_packer_reset():
 
 def test_text_packer_get_items():
     """Test getting item metadata."""
-    packer = TextPacker(max_tokens=100)
+    packer = TextPacker()
 
     packer.add("first", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
     packer.add("second", role=ROLE_USER, priority=PRIORITY_QUERY)
@@ -220,7 +220,7 @@ def test_text_packer_get_items():
 
 def test_text_packer_rag_scenario():
     """Test realistic RAG scenario with grouped markdown format."""
-    packer = TextPacker(max_tokens=300, text_format=TextFormat.MARKDOWN)
+    packer = TextPacker(text_format=TextFormat.MARKDOWN)
 
     # System prompt
     packer.add("You are a QA assistant.", role=ROLE_SYSTEM, priority=PRIORITY_SYSTEM)
@@ -243,8 +243,8 @@ def test_text_packer_rag_scenario():
 
 
 def test_text_packer_budget_enforcement():
-    """Test that token budget is enforced."""
-    packer = TextPacker(max_tokens=30, text_format=TextFormat.RAW, separator=" ")
+    """Test that all items are included (no budget limit)."""
+    packer = TextPacker(text_format=TextFormat.RAW, separator=" ")
 
     # Add many items
     for i in range(10):
@@ -252,15 +252,14 @@ def test_text_packer_budget_enforcement():
 
     text = packer.pack()
 
-    # Should fit only some items within budget
+    # All items should be included
     words = text.split()
-    assert len(words) < 10
-    assert len(words) > 0
+    assert len(words) == 10
 
 
 def test_text_packer_single_item():
     """Test packer with single item."""
-    packer = TextPacker(max_tokens=100)
+    packer = TextPacker()
     packer.add("only item", role=ROLE_CONTEXT, priority=PRIORITY_MEDIUM)
 
     text = packer.pack()
@@ -269,7 +268,7 @@ def test_text_packer_single_item():
 
 def test_text_packer_semantic_role_grouping():
     """Test that semantic roles are properly grouped in MARKDOWN format."""
-    packer = TextPacker(max_tokens=200, text_format=TextFormat.MARKDOWN)
+    packer = TextPacker(text_format=TextFormat.MARKDOWN)
 
     packer.add("System instruction", role=ROLE_SYSTEM, priority=PRIORITY_HIGH)
     packer.add("RAG document", role=ROLE_CONTEXT, priority=PRIORITY_HIGH)
@@ -286,10 +285,9 @@ def test_text_packer_semantic_role_grouping():
 
 
 def test_text_packer_delimiter_overhead():
-    """Test that delimiter overhead is accounted in budget."""
-    # Use small budget to test overflow prevention
-    packer_raw = TextPacker(max_tokens=50, text_format=TextFormat.RAW)
-    packer_markdown = TextPacker(max_tokens=50, text_format=TextFormat.MARKDOWN)
+    """Test that different formats include all items."""
+    packer_raw = TextPacker(text_format=TextFormat.RAW)
+    packer_markdown = TextPacker(text_format=TextFormat.MARKDOWN)
 
     # Add same items to both
     for i in range(5):
@@ -299,16 +297,17 @@ def test_text_packer_delimiter_overhead():
     text_raw = packer_raw.pack()
     text_markdown = packer_markdown.pack()
 
-    # Markdown should have more overhead, so might fit fewer items
+    # Both formats should include all items
     items_raw = text_raw.count("Item")
     items_markdown = text_markdown.count("Item")
 
-    assert items_markdown <= items_raw
+    assert items_raw == 5
+    assert items_markdown == 5
 
 
 def test_text_packer_add_messages_helper():
     """Test add_messages helper works with TextPacker."""
-    packer = TextPacker(max_tokens=200, text_format=TextFormat.MARKDOWN)
+    packer = TextPacker(text_format=TextFormat.MARKDOWN)
 
     messages = [
         {"role": ROLE_SYSTEM, "content": "You are helpful."},
@@ -342,13 +341,11 @@ def test_text_packer_unlimited_mode():
     assert "Document 19" in text
     assert "System prompt" in text
     assert "User query" in text
-    assert packer.effective_max_tokens is None
-    assert packer.raw_max_tokens is None
 
 
 def test_text_packer_smart_defaults():
     """Test smart priority defaults based on semantic roles."""
-    packer = TextPacker(max_tokens=300, text_format=TextFormat.MARKDOWN)
+    packer = TextPacker(text_format=TextFormat.MARKDOWN)
 
     # Smart defaults: no priority parameter needed!
     packer.add("System instruction", role=ROLE_SYSTEM)  # Auto: PRIORITY_SYSTEM (0)
@@ -386,7 +383,7 @@ def test_text_packer_smart_defaults():
 
 def test_text_packer_unknown_role():
     """Test that unknown roles default to PRIORITY_MEDIUM."""
-    packer = TextPacker(max_tokens=500, text_format=TextFormat.RAW)
+    packer = TextPacker(text_format=TextFormat.RAW)
 
     # Add item with unknown role (not one of the semantic constants)
     packer.add("Custom content", role="custom_role")
@@ -403,7 +400,7 @@ def test_text_packer_unknown_role():
 
 def test_token_savings_tracking_enabled():
     """Test that token savings are tracked when enabled."""
-    packer = TextPacker(max_tokens=500, track_savings=True)
+    packer = TextPacker(track_savings=True)
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test</p></div>"
@@ -428,7 +425,7 @@ def test_token_savings_tracking_enabled():
 
 def test_token_savings_tracking_disabled():
     """Test that token savings are not tracked when disabled by default."""
-    packer = TextPacker(max_tokens=500)  # track_savings defaults to False
+    packer = TextPacker()  # track_savings defaults to False
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test</p></div>"
@@ -443,7 +440,7 @@ def test_token_savings_tracking_disabled():
 
 def test_token_savings_no_refinement():
     """Test that empty dict is returned when no items are refined."""
-    packer = TextPacker(max_tokens=500, track_savings=True)
+    packer = TextPacker(track_savings=True)
 
     # Add items WITHOUT refinement
     packer.add("Clean content", role=ROLE_SYSTEM)
@@ -458,7 +455,7 @@ def test_token_savings_no_refinement():
 
 def test_token_savings_multiple_items():
     """Test that savings are aggregated across multiple refined items."""
-    packer = TextPacker(max_tokens=1000, track_savings=True)
+    packer = TextPacker(track_savings=True)
 
     # Add multiple items with refinement
     dirty_html1 = "<div><p>First document</p></div>"
@@ -483,7 +480,7 @@ def test_token_savings_multiple_items():
 
 def test_token_savings_reset():
     """Test that reset clears savings statistics."""
-    packer = TextPacker(max_tokens=500, track_savings=True)
+    packer = TextPacker(track_savings=True)
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test</p></div>"
@@ -512,7 +509,7 @@ def test_token_savings_reset():
 def test_token_savings_with_model():
     """Test that token savings work with precise token counting."""
     # Note: This test works whether or not tiktoken is installed
-    packer = TextPacker(max_tokens=500, model="gpt-4", track_savings=True)
+    packer = TextPacker(model="gpt-4", track_savings=True)
 
     # Add item with refinement
     dirty_html = "<div><p>This is a test with precise counting</p></div>"
@@ -534,9 +531,7 @@ def test_token_savings_with_model():
 
 def test_constructor_with_system():
     """Test constructor with system parameter."""
-    packer = TextPacker(
-        max_tokens=100, text_format=TextFormat.MARKDOWN, system="You are a helpful assistant."
-    )
+    packer = TextPacker(text_format=TextFormat.MARKDOWN, system="You are a helpful assistant.")
 
     text = packer.pack()
 
@@ -546,9 +541,7 @@ def test_constructor_with_system():
 
 def test_constructor_with_context():
     """Test constructor with context parameter."""
-    packer = TextPacker(
-        max_tokens=200, text_format=TextFormat.MARKDOWN, context=["Doc 1", "Doc 2", "Doc 3"]
-    )
+    packer = TextPacker(text_format=TextFormat.MARKDOWN, context=["Doc 1", "Doc 2", "Doc 3"])
 
     text = packer.pack()
 
@@ -561,7 +554,6 @@ def test_constructor_with_context():
 def test_constructor_with_history():
     """Test constructor with history parameter."""
     packer = TextPacker(
-        max_tokens=200,
         text_format=TextFormat.MARKDOWN,
         history=[
             {"role": "user", "content": "Hello"},
@@ -578,9 +570,7 @@ def test_constructor_with_history():
 
 def test_constructor_with_query():
     """Test constructor with query parameter."""
-    packer = TextPacker(
-        max_tokens=100, text_format=TextFormat.MARKDOWN, query="What's the weather?"
-    )
+    packer = TextPacker(text_format=TextFormat.MARKDOWN, query="What's the weather?")
 
     text = packer.pack()
 
@@ -591,7 +581,6 @@ def test_constructor_with_query():
 def test_constructor_with_all_parameters():
     """Test constructor with all parameters."""
     packer = TextPacker(
-        max_tokens=500,
         text_format=TextFormat.MARKDOWN,
         system="You are helpful.",
         context=["Doc 1", "Doc 2"],
@@ -614,7 +603,6 @@ def test_constructor_with_all_parameters():
 def test_constructor_with_system_and_refiner():
     """Test constructor with system and refiner using tuple syntax."""
     packer = TextPacker(
-        max_tokens=200,
         text_format=TextFormat.RAW,
         system=("You    are    helpful.", Pipeline([NormalizeWhitespace()])),
     )
@@ -627,7 +615,6 @@ def test_constructor_with_system_and_refiner():
 def test_constructor_with_context_and_refiner():
     """Test constructor with context and refiner using tuple syntax."""
     packer = TextPacker(
-        max_tokens=300,
         text_format=TextFormat.RAW,
         context=(["<div>Doc 1</div>", "<p>Doc 2</p>"], Pipeline([StripHTML()])),
     )
@@ -643,7 +630,6 @@ def test_constructor_with_context_and_refiner():
 def test_constructor_with_history_and_refiner():
     """Test constructor with history and refiner using tuple syntax."""
     packer = TextPacker(
-        max_tokens=200,
         text_format=TextFormat.RAW,
         history=(
             [{"role": "user", "content": "Hello    world"}],
@@ -659,7 +645,6 @@ def test_constructor_with_history_and_refiner():
 def test_constructor_with_query_and_refiner():
     """Test constructor with query and refiner using tuple syntax."""
     packer = TextPacker(
-        max_tokens=100,
         text_format=TextFormat.RAW,
         query=("<div>What's the weather?</div>", Pipeline([StripHTML()])),
     )
@@ -672,9 +657,7 @@ def test_constructor_with_query_and_refiner():
 
 def test_constructor_with_track_savings():
     """Test constructor with track_savings enabled."""
-    packer = TextPacker(
-        max_tokens=200, track_savings=True, context=(["<div>Test</div>"], Pipeline([StripHTML()]))
-    )
+    packer = TextPacker(track_savings=True, context=(["<div>Test</div>"], Pipeline([StripHTML()])))
 
     text = packer.pack()
     savings = packer.get_token_savings()
@@ -733,21 +716,6 @@ def test_quick_pack_with_refiners():
     assert "<div>" not in text
 
 
-def test_quick_pack_with_max_tokens():
-    """Test quick_pack with token budget."""
-    text = TextPacker.quick_pack(
-        max_tokens=50,
-        text_format=TextFormat.RAW,
-        system="System",
-        context=["Very long context " * 100],
-        query="Query",
-    )
-
-    # Should respect token budget
-    assert "System" in text
-    assert "Query" in text
-
-
 def test_quick_pack_with_model():
     """Test quick_pack with model parameter."""
     text = TextPacker.quick_pack(
@@ -785,7 +753,7 @@ def test_quick_pack_with_track_savings():
 
 def test_constructor_and_add_method_combined():
     """Test that constructor parameters and add() method work together."""
-    packer = TextPacker(max_tokens=500, text_format=TextFormat.RAW, system="You are helpful.")
+    packer = TextPacker(text_format=TextFormat.RAW, system="You are helpful.")
 
     # Add more items using traditional API
     packer.add("Additional context", role=ROLE_CONTEXT)

@@ -3,18 +3,16 @@
 import logging
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
-from .base import ROLE_CONTEXT, ROLE_QUERY, BasePacker, PackableItem
+from .base import ROLE_CONTEXT, ROLE_QUERY, BasePacker
 
 if TYPE_CHECKING:
     from ..pipeline import Pipeline
     from ..refiner import Refiner
 
-logger = logging.getLogger(__name__)
+# Import default strategies for auto-refinement
+from ..strategy import MinimalStrategy, StandardStrategy
 
-# Token overhead for ChatML format
-# Each message has: <|im_start|>role\n{content}\n<|im_end|>
-PER_MESSAGE_OVERHEAD = 4
-PER_REQUEST_OVERHEAD = 3  # Base overhead for the request
+logger = logging.getLogger(__name__)
 
 
 class MessagesPacker(BasePacker):
@@ -29,24 +27,25 @@ class MessagesPacker(BasePacker):
     Returns: List[Dict[str, str]] with 'role' and 'content' keys
 
     Example:
-        >>> from prompt_refiner import MessagesPacker, PRIORITY_SYSTEM, PRIORITY_USER
-        >>> # With token budget
-        >>> packer = MessagesPacker(max_tokens=1000)
-        >>> packer.add("You are helpful.", role="system", priority=PRIORITY_SYSTEM)
-        >>> packer.add("Hello!", role="user", priority=PRIORITY_USER)
+        >>> from prompt_refiner import MessagesPacker
+        >>> # Basic usage with automatic refining
+        >>> packer = MessagesPacker(
+        ...     system="You are helpful.",
+        ...     context=["<div>Doc 1</div>", "<div>Doc 2</div>"],
+        ...     query="What's the weather?"
+        ... )
         >>> messages = packer.pack()
         >>> # Use directly: openai.chat.completions.create(messages=messages)
         >>>
-        >>> # Without token budget (unlimited mode)
-        >>> packer = MessagesPacker()  # All items included
-        >>> packer.add("System prompt", role="system", priority=PRIORITY_SYSTEM)
-        >>> packer.add("User query", role="user", priority=PRIORITY_USER)
+        >>> # Traditional API still supported
+        >>> packer = MessagesPacker()
+        >>> packer.add("System prompt", role="system")
+        >>> packer.add("User query", role="user")
         >>> messages = packer.pack()
     """
 
     def __init__(
         self,
-        max_tokens: Optional[int] = None,
         model: Optional[str] = None,
         track_savings: bool = False,
         system: Optional[Union[str, Tuple[str, Union["Refiner", "Pipeline"]]]] = None,
@@ -62,13 +61,20 @@ class MessagesPacker(BasePacker):
         """
         Initialize messages packer.
 
+        **Default Refining Strategies**:
+        When no explicit refiner is provided, automatic refining strategies are applied:
+        - system/query: MinimalStrategy (StripHTML + NormalizeWhitespace)
+        - context/history: StandardStrategy (StripHTML + NormalizeWhitespace + Deduplicate)
+
+        To override defaults, provide explicit refiner tuple: (content, refiner).
+        For raw content with no refinement, use .add() method with refine_with=None.
+
         Args:
-            max_tokens: Maximum token budget. If None, includes all items without limit.
             model: Optional model name for precise token counting
-            track_savings: Enable automatic token savings tracking for refine_with
-                operations (default: False)
+            track_savings: Enable automatic token savings tracking to measure
+                optimization impact (default: False)
             system: System message. Can be:
-                - str: "You are helpful"
+                - str: "You are helpful"  (automatically refined with MinimalStrategy)
                 - Tuple[str, Refiner]: ("You are helpful", StripHTML())
                 - Tuple[str, Pipeline]: ("You are helpful", StripHTML() | NormalizeWhitespace())
             context: Context documents. Can be:
@@ -124,37 +130,40 @@ class MessagesPacker(BasePacker):
             >>> packer.add("Doc 1", role="context")
             >>> messages = packer.pack()
         """
-        super().__init__(max_tokens, model, track_savings)
-
-        # Pre-deduct request-level overhead (priming tokens) if budget is limited
-        if self.effective_max_tokens is not None:
-            self.effective_max_tokens -= PER_REQUEST_OVERHEAD
-            logger.debug(
-                f"MessagesPacker initialized with {max_tokens} tokens "
-                f"(effective: {self.effective_max_tokens} after {PER_REQUEST_OVERHEAD} "
-                f"token request overhead)"
-            )
-        else:
-            logger.debug("MessagesPacker initialized in unlimited mode")
+        super().__init__(model, track_savings)
+        logger.debug("MessagesPacker initialized")
 
         # Auto-add items if provided (convenient API)
         # Extract content and refiner from tuple if provided
+        # Apply default strategies when no explicit refiner provided
         if system is not None:
             system_content, system_refiner = self._extract_field(system)
+            # Apply MinimalStrategy to system if no explicit refiner
+            if system_refiner is None:
+                system_refiner = MinimalStrategy()
             self.add(system_content, role="system", refine_with=system_refiner)
 
         if context is not None:
             context_docs, context_refiner = self._extract_field(context)
+            # Apply StandardStrategy to context if no explicit refiner
+            if context_refiner is None:
+                context_refiner = StandardStrategy()
             for doc in context_docs:
                 self.add(doc, role="context", refine_with=context_refiner)
 
         if history is not None:
             history_msgs, history_refiner = self._extract_field(history)
+            # Apply StandardStrategy to history if no explicit refiner
+            if history_refiner is None:
+                history_refiner = StandardStrategy()
             for msg in history_msgs:
                 self.add(msg["content"], role=msg["role"], refine_with=history_refiner)
 
         if query is not None:
             query_content, query_refiner = self._extract_field(query)
+            # Apply MinimalStrategy to query if no explicit refiner
+            if query_refiner is None:
+                query_refiner = MinimalStrategy()
             self.add(query_content, role="query", refine_with=query_refiner)
 
     @staticmethod
@@ -191,11 +200,14 @@ class MessagesPacker(BasePacker):
         ] = None,
         query: Optional[Union[str, Tuple[str, Union["Refiner", "Pipeline"]]]] = None,
         model: Optional[str] = None,
-        max_tokens: Optional[int] = None,
         track_savings: bool = False,
     ) -> List[Dict[str, str]]:
         """
         One-liner to create packer and pack messages immediately.
+
+        Default refining strategies are automatically applied (same as __init__):
+        - system/query: MinimalStrategy
+        - context/history: StandardStrategy
 
         Args:
             system: System message (str or (str, Refiner/Pipeline) tuple)
@@ -203,7 +215,6 @@ class MessagesPacker(BasePacker):
             history: Conversation history (list or (list, Refiner/Pipeline) tuple)
             query: Current query (str or (str, Refiner/Pipeline) tuple)
             model: Optional model name for precise token counting
-            max_tokens: Optional token budget
             track_savings: Enable token savings tracking
 
         Returns:
@@ -238,7 +249,6 @@ class MessagesPacker(BasePacker):
             >>> # Ready to use: client.chat.completions.create(messages=messages)
         """
         packer = cls(
-            max_tokens=max_tokens,
             model=model,
             track_savings=track_savings,
             system=system,
@@ -247,24 +257,6 @@ class MessagesPacker(BasePacker):
             query=query,
         )
         return packer.pack()
-
-    def _calculate_overhead(self, item: PackableItem) -> int:
-        """
-        Calculate ChatML format overhead for messages.
-
-        Each message in ChatML format consumes ~4 tokens for formatting:
-        <|im_start|>role\n{content}\n<|im_end|>
-
-        Note: PER_REQUEST_OVERHEAD (3 tokens) is pre-deducted in __init__,
-        so we only return per-message overhead here.
-
-        Args:
-            item: Item to calculate overhead for
-
-        Returns:
-            Number of overhead tokens (4 tokens per message)
-        """
-        return PER_MESSAGE_OVERHEAD
 
     def pack(self) -> List[Dict[str, str]]:
         """
@@ -283,7 +275,7 @@ class MessagesPacker(BasePacker):
             >>> messages = packer.pack()
             >>> openai.chat.completions.create(model="gpt-4", messages=messages)
         """
-        selected_items = self._greedy_select()
+        selected_items = self._select_items()
 
         if not selected_items:
             logger.warning("No items selected, returning empty message list")

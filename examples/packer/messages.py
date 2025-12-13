@@ -38,8 +38,8 @@ def main():
         role="system",
     )
 
-    # Add RAG documents with automatic cleaning pipeline
-    packer.add(doc_html, role="context", refine_with=[StripHTML(), NormalizeWhitespace()])
+    # Add RAG documents with explicit cleaning pipeline
+    packer.add(doc_html, role="context", refine_with=StripHTML() | NormalizeWhitespace())
     packer.add(
         "The library includes MessagesPacker for chat APIs and TextPacker for completion APIs.",
         role="context",
