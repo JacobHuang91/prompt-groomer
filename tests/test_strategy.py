@@ -181,7 +181,7 @@ class TestStrategyComposition:
     def test_strategy_pipe_additional_operations(self):
         """Test composing strategy with additional operations."""
         refiner = MinimalStrategy().create_refiner()
-        refiner.pipe(RedactPII(redact_types={"email"}))
+        refiner = refiner.pipe(RedactPII(redact_types={"email"}))  # Capture new instance
 
         result = refiner.run("<div>Contact: test@example.com</div>")
         assert "[EMAIL]" in result
@@ -192,7 +192,7 @@ class TestStrategyComposition:
         from prompt_refiner import FixUnicode
 
         refiner = MinimalStrategy().create_refiner()
-        refiner.pipe(FixUnicode())
+        refiner = refiner.pipe(FixUnicode())  # Capture new instance
 
         # Unicode test with HTML
         result = refiner.run("<div>Hello\u200bWorld</div>")

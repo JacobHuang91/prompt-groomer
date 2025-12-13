@@ -162,7 +162,7 @@ class TextPacker(BasePacker):
 
     @staticmethod
     def _extract_field(
-        field: Union[any, Tuple[any, List["Operation"]]]
+        field: Union[any, Tuple[any, List["Operation"]]],
     ) -> Tuple[any, Optional[List["Operation"]]]:
         """
         Extract content and refiner from a field.

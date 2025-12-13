@@ -27,7 +27,7 @@ class BaseStrategy(ABC):
         """
         refiner = Refiner()
         for operation in self.get_operations():
-            refiner.pipe(operation)
+            refiner = refiner.pipe(operation)  # Capture new instance (immutable)
         return refiner
 
     def __call__(self, text: str) -> str:

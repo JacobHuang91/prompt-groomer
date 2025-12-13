@@ -16,14 +16,25 @@ class Refiner:
         """
         Add an operation to the pipeline.
 
+        Returns a new Refiner instance with the operation added, leaving the
+        original unchanged (immutable).
+
         Args:
             operation: The operation to add
 
         Returns:
-            Self for method chaining
+            A new Refiner instance with the operation added
+
+        Example:
+            >>> base = Refiner().pipe(StripHTML())
+            >>> pipeline1 = base.pipe(NormalizeWhitespace())
+            >>> pipeline2 = base.pipe(TruncateTokens(100))
+            >>> # base still has 1 operation, pipeline1 and pipeline2 each have 2
         """
-        self._operations.append(operation)
-        return self
+        new_refiner = Refiner()
+        new_refiner._operations = self._operations.copy()
+        new_refiner._operations.append(operation)
+        return new_refiner
 
     def run(self, text: str) -> str:
         """
@@ -44,17 +55,20 @@ class Refiner:
         """
         Support pipe operator syntax for adding operations to the pipeline.
 
+        Returns a new Refiner instance, leaving the original unchanged (immutable).
         Enables continued chaining: (op1 | op2) | op3
 
         Args:
             other: The operation to add to the pipeline
 
         Returns:
-            Self for method chaining
+            A new Refiner instance with the operation added
 
         Example:
             >>> from prompt_refiner import StripHTML, NormalizeWhitespace, TruncateTokens
-            >>> pipeline = StripHTML() | NormalizeWhitespace() | TruncateTokens(max_tokens=100)
-            >>> result = pipeline.run(text)
+            >>> base = StripHTML() | NormalizeWhitespace()
+            >>> pipeline1 = base | TruncateTokens(max_tokens=100)
+            >>> pipeline2 = base | TruncateTokens(max_tokens=200)
+            >>> # base has 2 ops, pipeline1 and pipeline2 each have 3 different ops
         """
         return self.pipe(other)

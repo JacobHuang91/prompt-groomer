@@ -73,3 +73,46 @@ def test_pipe_operator_full_pipeline():
     assert ">" not in clean_prompt
     assert "  " not in clean_prompt
     assert len(clean_prompt) > 0
+
+
+def test_refiner_immutability():
+    """Test that pipe() creates new instances and doesn't mutate original."""
+    # Create base pipeline
+    base = StripHTML() | NormalizeWhitespace()
+    assert len(base._operations) == 2
+
+    # Create two different pipelines from base
+    pipeline1 = base | TruncateTokens(max_tokens=100)
+    pipeline2 = base | TruncateTokens(max_tokens=200)
+
+    # Base should still have 2 operations
+    assert len(base._operations) == 2
+
+    # New pipelines should have 3 operations each
+    assert len(pipeline1._operations) == 3
+    assert len(pipeline2._operations) == 3
+
+    # They should be different objects
+    assert pipeline1 is not base
+    assert pipeline2 is not base
+    assert pipeline1 is not pipeline2
+
+    # Verify operations work independently
+    text = "<div>hello   world</div>"
+    assert base.run(text) == "hello world"
+
+
+def test_refiner_pipe_immutability():
+    """Test that .pipe() method is also immutable."""
+    base = Refiner().pipe(StripHTML())
+    assert len(base._operations) == 1
+
+    # Add another operation
+    extended = base.pipe(NormalizeWhitespace())
+    assert len(extended._operations) == 2
+
+    # Original should still have 1
+    assert len(base._operations) == 1
+
+    # They should be different objects
+    assert extended is not base
