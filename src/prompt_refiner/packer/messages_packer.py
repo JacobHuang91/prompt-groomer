@@ -1,9 +1,12 @@
 """MessagesPacker for chat completion APIs (OpenAI, Anthropic, etc.)."""
 
 import logging
-from typing import Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 from .base import ROLE_CONTEXT, ROLE_QUERY, BasePacker, PackableItem
+
+if TYPE_CHECKING:
+    from ..operation import Operation
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +48,12 @@ class MessagesPacker(BasePacker):
         max_tokens: Optional[int] = None,
         model: Optional[str] = None,
         track_savings: bool = False,
-        system: Optional[Union[str, Tuple[str, List]]] = None,
-        context: Optional[Union[List[str], Tuple[List[str], List]]] = None,
-        history: Optional[Union[List[Dict[str, str]], Tuple[List[Dict[str, str]], List]]] = None,
-        query: Optional[Union[str, Tuple[str, List]]] = None,
+        system: Optional[Union[str, Tuple[str, List["Operation"]]]] = None,
+        context: Optional[Union[List[str], Tuple[List[str], List["Operation"]]]] = None,
+        history: Optional[
+            Union[List[Dict[str, str]], Tuple[List[Dict[str, str]], List["Operation"]]]
+        ] = None,
+        query: Optional[Union[str, Tuple[str, List["Operation"]]]] = None,
     ):
         """
         Initialize messages packer.
@@ -133,7 +138,9 @@ class MessagesPacker(BasePacker):
             self.add(query_content, role="query", refine_with=query_refiner)
 
     @staticmethod
-    def _extract_field(field: Union[any, Tuple[any, List]]) -> Tuple[any, Optional[List]]:
+    def _extract_field(
+        field: Union[any, Tuple[any, List["Operation"]]]
+    ) -> Tuple[any, Optional[List["Operation"]]]:
         """
         Extract content and refiner from a field.
 
@@ -152,10 +159,12 @@ class MessagesPacker(BasePacker):
     @classmethod
     def quick_pack(
         cls,
-        system: Optional[Union[str, Tuple[str, List]]] = None,
-        context: Optional[Union[List[str], Tuple[List[str], List]]] = None,
-        history: Optional[Union[List[Dict[str, str]], Tuple[List[Dict[str, str]], List]]] = None,
-        query: Optional[Union[str, Tuple[str, List]]] = None,
+        system: Optional[Union[str, Tuple[str, List["Operation"]]]] = None,
+        context: Optional[Union[List[str], Tuple[List[str], List["Operation"]]]] = None,
+        history: Optional[
+            Union[List[Dict[str, str]], Tuple[List[Dict[str, str]], List["Operation"]]]
+        ] = None,
+        query: Optional[Union[str, Tuple[str, List["Operation"]]]] = None,
         model: Optional[str] = None,
         max_tokens: Optional[int] = None,
         track_savings: bool = False,
